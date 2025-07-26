@@ -36,7 +36,8 @@ const Sidebar = () => {
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <Home size={20} /> },
-    { name: 'Products', path: '/dashboard/products', icon: <ShoppingBag size={20} /> },
+    { name: 'Search Products', path: '/dashboard/search', icon: <Search size={20} /> },
+    { name: 'Tracked Products', path: '/dashboard/products', icon: <ShoppingBag size={20} /> },
     { name: 'Price Alerts', path: '/dashboard/alerts', icon: <Bell size={20} /> },
     { name: 'Wishlist', path: '/dashboard/wishlist', icon: <Heart size={20} /> },
     { name: 'Analytics', path: '/dashboard/analytics', icon: <BarChart3 size={20} /> },

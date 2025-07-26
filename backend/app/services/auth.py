@@ -1,768 +1,483 @@
 import logging
 import jwt
 import json
+import uuid
 from datetime import datetime, timedelta, timezone
-from typing import Dict, Any
-from supabase.client import Client
-from flask import abort
+from typing import Dict, Any, Optional
+from flask import abort, current_app
+from flask_bcrypt import Bcrypt
+from sqlalchemy.orm import Session
 
-from app.config.supabase import SupabaseConfig
+from app.extensions.extensions import db
+from app.models.user import User, UserSession, UserPreference
 from app.config.app_config import AppConfig
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+bcrypt = Bcrypt()
+
 class AuthService:
     """
-    Authentication service for handling user authentication with Supabase.
+    Authentication service for handling user authentication with SQLAlchemy and JWT.
     """
 
     @staticmethod
-    def get_supabase_client() -> Client:
+    def hash_password(password: str) -> str:
         """
-        Get a Supabase client instance.
-
+        Hash a password using bcrypt.
+        
+        Args:
+            password: Plain text password
+            
         Returns:
-            Client: A Supabase client instance.
+            str: Hashed password
         """
-        return SupabaseConfig.get_client()
+        return bcrypt.generate_password_hash(password).decode('utf-8')
 
     @staticmethod
-    def get_admin_client() -> Client:
+    def verify_password(password: str, hashed_password: str) -> bool:
         """
-        Get a Supabase admin client instance.
-
+        Verify a password against its hash.
+        
+        Args:
+            password: Plain text password
+            hashed_password: Hashed password
+            
         Returns:
-            Client: A Supabase client instance with admin privileges.
+            bool: True if password matches, False otherwise
         """
-        return SupabaseConfig.get_admin_client()
+        return bcrypt.check_password_hash(hashed_password, password)
+
+    @staticmethod
+    def generate_jwt_token(user_id: str, expires_in: int = None) -> str:
+        """
+        Generate a JWT token for a user.
+        
+        Args:
+            user_id: User ID
+            expires_in: Token expiration time in seconds
+            
+        Returns:
+            str: JWT token
+        """
+        if expires_in is None:
+            expires_in = AppConfig.JWT_EXPIRATION
+            
+        payload = {
+            'user_id': user_id,
+            'exp': datetime.utcnow() + timedelta(seconds=expires_in),
+            'iat': datetime.utcnow()
+        }
+        
+        return jwt.encode(payload, AppConfig.JWT_SECRET, algorithm=AppConfig.JWT_ALGORITHM)
+
+    @staticmethod
+    def verify_jwt_token(token: str) -> Optional[Dict[str, Any]]:
+        """
+        Verify and decode a JWT token.
+        
+        Args:
+            token: JWT token
+            
+        Returns:
+            Optional[Dict[str, Any]]: Decoded token payload or None if invalid
+        """
+        try:
+            payload = jwt.decode(token, AppConfig.JWT_SECRET, algorithms=[AppConfig.JWT_ALGORITHM])
+            return payload
+        except jwt.ExpiredSignatureError:
+            logger.warning("JWT token has expired")
+            return None
+        except jwt.InvalidTokenError:
+            logger.warning("Invalid JWT token")
+            return None
 
     @classmethod
-    async def signup_with_email(cls, email: str, password: str, full_name: str = None) -> Dict[str, Any]:
+    def register_user(cls, email: str, password: str, username: str = None, full_name: str = None) -> Dict[str, Any]:
         """
-        Register a new user with email and password.
-
+        Register a new user.
+        
         Args:
             email: User's email address
             password: User's password
+            username: User's username (optional)
             full_name: User's full name (optional)
-
+            
         Returns:
-            Dict containing user data and session
-
+            Dict containing user data
+            
         Raises:
             Flask abort: If registration fails
         """
         try:
-            supabase = cls.get_supabase_client()
-
-            # Register user with Supabase Auth
-            auth_response = supabase.auth.sign_up({
-                "email": email,
-                "password": password,
-                "options": {
-                    "data": {
-                        "full_name": full_name
-                    }
-                }
-            })
-
-            if not auth_response.user:
-                abort(400, description="Failed to create user account")
-
-            user_id = auth_response.user.id
-
-            # Get full name from user metadata if available
-            user_metadata = auth_response.user.user_metadata or {}
-            display_name = user_metadata.get("full_name") or full_name
-
-            # Add additional user data to the users table
-            user_data = {
-                "user_id": user_id,
-                "email": email,
-                "password_hash": password,  # Store the password hash
-                "full_name": display_name,
-                "created_at": datetime.now(timezone.utc).isoformat(),
-                "updated_at": datetime.now(timezone.utc).isoformat(),
-                "email_verified": False
-            }
-
-            # Use admin client to insert user data
-            admin_client = cls.get_admin_client()
-            user_response = admin_client.table("users").insert(user_data).execute()
-
-            if len(user_response.data) == 0:
-                # If user data insertion fails, we should delete the auth user
-                admin_client.auth.admin.delete_user(user_id)
-                abort(500, description="Failed to create user profile")
-
+            # Check if user already exists
+            existing_user = User.query.filter_by(email=email).first()
+            if existing_user:
+                abort(409, description="User with this email already exists")
+            
+            if username:
+                existing_username = User.query.filter_by(username=username).first()
+                if existing_username:
+                    abort(409, description="Username already taken")
+            
+            # Create new user
+            user = User(
+                user_id=str(uuid.uuid4()),
+                email=email,
+                password_hash=cls.hash_password(password),
+                username=username,
+                full_name=full_name,
+                email_verified=False  # Require email verification
+            )
+            
+            db.session.add(user)
+            db.session.commit()
+            
             # Create default user preferences
-            preferences_data = {
-                "user_id": user_id,
-                "created_at": datetime.now(timezone.utc).isoformat(),
-                "updated_at": datetime.now(timezone.utc).isoformat()
-            }
+            preferences = UserPreference(user_id=user.user_id)
+            db.session.add(preferences)
+            db.session.commit()
 
-            admin_client.table("user_preferences").insert(preferences_data).execute()
+            # Send verification email
+            from app.services.email_service import EmailService
+            email_sent = EmailService.send_verification_email(user.user_id, user.email, user.full_name)
 
-            # Create a serializable version of the user and session
-            user_data = {
-                "id": auth_response.user.id,
-                "email": auth_response.user.email,
-                "full_name": full_name,
-                "email_verified": False
-            }
-
-            session_data = None
-            if auth_response.session:
-                session_data = {
-                    "access_token": auth_response.session.access_token,
-                    "refresh_token": auth_response.session.refresh_token,
-                    "expires_in": auth_response.session.expires_in,
-                    "token_type": auth_response.session.token_type
-                }
+            if not email_sent:
+                logger.warning(f"Failed to send verification email to {user.email}")
 
             return {
-                "user": user_data,
-                "session": session_data,
-                "message": "User registered successfully. Please verify your email."
+                "user_id": user.user_id,
+                "email": user.email,
+                "username": user.username,
+                "full_name": user.full_name,
+                "created_at": user.created_at.isoformat(),
+                "email_verified": user.email_verified,
+                "message": "Registration successful. Please check your email to verify your account."
             }
-
+            
         except Exception as e:
-            logger.error(f"Error during signup: {str(e)}")
-            if "User already registered" in str(e):
-                abort(409, description="User with this email already exists")
-            abort(500, description=f"Error during signup: {str(e)}")
+            db.session.rollback()
+            logger.error(f"Error registering user: {str(e)}")
+            abort(500, description="Internal server error")
 
     @classmethod
-    async def login_with_email(cls, email: str, password: str, device_info: Dict[str, Any] = None) -> Dict[str, Any]:
+    def login_with_email(cls, email: str, password: str, device_info: Dict[str, Any] = None) -> Dict[str, Any]:
         """
         Authenticate a user with email and password.
-
+        
         Args:
             email: User's email address
             password: User's password
             device_info: Dictionary containing device and browser information
-
+            
         Returns:
             Dict containing user data and session
-
+            
         Raises:
             Flask abort: If authentication fails
         """
         try:
-            supabase = cls.get_supabase_client()
-
-            # Authenticate user with Supabase Auth
-            auth_response = supabase.auth.sign_in_with_password({
-                "email": email,
-                "password": password
-            })
-
-            if not auth_response.user:
+            # Find user by email
+            user = User.query.filter_by(email=email).first()
+            if not user:
                 abort(401, description="Invalid credentials")
-
-            user_id = auth_response.user.id
-
+            
+            # Verify password
+            if not cls.verify_password(password, user.password_hash):
+                abort(401, description="Invalid credentials")
+            
             # Update last login timestamp
-            admin_client = cls.get_admin_client()
-            admin_client.table("users").update({
-                "last_login_at": datetime.now(timezone.utc).isoformat()
-            }).eq("user_id", user_id).execute()
-
-            # Record session - use a truncated or hashed token to fit in VARCHAR(255)
-            # We'll use the first 32 characters of the token as an identifier
-            # This is safe because we're just using it as a reference, not for authentication
-            token_identifier = auth_response.session.access_token[:32]
-
-            # Prepare session data
-            session_data = {
-                "user_id": user_id,
-                "token": token_identifier,
-                "created_at": datetime.now(timezone.utc).isoformat(),
-                "expires_at": (datetime.now(timezone.utc) + timedelta(seconds=auth_response.session.expires_in)).isoformat(),
-                "last_active_at": datetime.now(timezone.utc).isoformat()
-            }
-
-            # Add device info if available
-            if device_info:
-                # Convert device info to JSONB format
-                session_data["device_info"] = json.dumps(device_info)
-                if "ip_address" in device_info:
-                    session_data["ip_address"] = device_info["ip_address"]
-
-            try:
-                admin_client.table("user_sessions").insert(session_data).execute()
-            except Exception as e:
-                # If session recording fails, log it but don't fail the login
-                logger.error(f"Failed to record session: {str(e)}")
-                # Continue with login process
-
-            # Get user preferences to check onboarding status
-            preferences_response = admin_client.table("user_preferences").select("*").eq("user_id", user_id).execute()
-            preferences_data = preferences_response.data[0] if len(preferences_response.data) > 0 else {}
-
-            # Create a serializable version of the user and session
-            user_data = {
-                "id": auth_response.user.id,
-                "email": auth_response.user.email,
-                "email_verified": auth_response.user.email_confirmed_at is not None,
-                "onboarding_completed": preferences_data.get("onboarding_completed", False)
-            }
-
-            session_data = None
-            if auth_response.session:
-                session_data = {
-                    "access_token": auth_response.session.access_token,
-                    "refresh_token": auth_response.session.refresh_token,
-                    "expires_in": auth_response.session.expires_in,
-                    "token_type": auth_response.session.token_type
-                }
-
+            user.last_login_at = datetime.now(timezone.utc)
+            db.session.commit()
+            
+            # Generate JWT token
+            token = cls.generate_jwt_token(user.user_id)
+            
+            # Create session record
+            session = UserSession(
+                session_id=str(uuid.uuid4()),
+                user_id=user.user_id,
+                token=token[:32],  # Store truncated token as identifier
+                device_info=json.dumps(device_info) if device_info else None,
+                expires_at=datetime.now(timezone.utc) + timedelta(seconds=AppConfig.JWT_EXPIRATION)
+            )
+            
+            db.session.add(session)
+            db.session.commit()
+            
             return {
-                "user": user_data,
-                "session": session_data,
-                "message": "Login successful"
+                "user": {
+                    "user_id": user.user_id,
+                    "email": user.email,
+                    "username": user.username,
+                    "full_name": user.full_name,
+                    "account_status": user.account_status,
+                    "email_verified": user.email_verified
+                },
+                "session": {
+                    "access_token": token,
+                    "expires_in": AppConfig.JWT_EXPIRATION,
+                    "token_type": "bearer"
+                }
             }
-
+            
         except Exception as e:
+            db.session.rollback()
             logger.error(f"Error during login: {str(e)}")
-            if "Invalid login credentials" in str(e):
-                abort(401, description="Invalid email or password")
-            abort(500, description=f"Error during login: {str(e)}")
+            abort(500, description="Internal server error")
 
     @classmethod
-    async def login_with_google(cls, access_token: str, device_info: Dict[str, Any] = None) -> Dict[str, Any]:
+    def get_current_user(cls, token: str) -> Optional[User]:
         """
-        Authenticate a user with Google OAuth.
-
+        Get the current user from a JWT token.
+        
         Args:
-            access_token: Google OAuth access token
-            device_info: Dictionary containing device and browser information
-
+            token: JWT token
+            
         Returns:
-            Dict containing user data and session
-
-        Raises:
-            Flask abort: If authentication fails
+            Optional[User]: User object or None if invalid
         """
         try:
-            supabase = cls.get_supabase_client()
-
-            # Sign in with Google OAuth token
-            auth_response = supabase.auth.sign_in_with_oauth({
-                "provider": "google",
-                "access_token": access_token
-            })
-
-            if not auth_response.user:
-                abort(401, description="Google authentication failed")
-
-            user_id = auth_response.user.id
-            email = auth_response.user.email
-
-            # Check if user exists in our database
-            admin_client = cls.get_admin_client()
-            user_response = admin_client.table("users").select("*").eq("user_id", user_id).execute()
-
-            if len(user_response.data) == 0:
-                # Get user metadata
-                user_metadata = auth_response.user.user_metadata or {}
-                display_name = user_metadata.get("full_name") or user_metadata.get("name") or email.split("@")[0]
-
-                # First-time Google login, create user profile
-                user_data = {
-                    "user_id": user_id,
-                    "email": email,
-                    "password_hash": "google_oauth",  # Placeholder for OAuth users
-                    "full_name": display_name,
-                    "created_at": datetime.now(timezone.utc).isoformat(),
-                    "updated_at": datetime.now(timezone.utc).isoformat(),
-                    "email_verified": True
-                }
-
-                admin_client.table("users").insert(user_data).execute()
-
-                # Create default user preferences
-                preferences_data = {
-                    "user_id": user_id,
-                    "created_at": datetime.now(timezone.utc).isoformat(),
-                    "updated_at": datetime.now(timezone.utc).isoformat()
-                }
-
-                admin_client.table("user_preferences").insert(preferences_data).execute()
-            else:
-                # Update last login timestamp
-                admin_client.table("users").update({
-                    "last_login_at": datetime.now(timezone.utc).isoformat()
-                }).eq("user_id", user_id).execute()
-
-            # Record session - use a truncated or hashed token to fit in VARCHAR(255)
-            # We'll use the first 32 characters of the token as an identifier
-            token_identifier = auth_response.session.access_token[:32]
-
-            # Prepare session data
-            session_data = {
-                "user_id": user_id,
-                "token": token_identifier,
-                "created_at": datetime.now(timezone.utc).isoformat(),
-                "expires_at": (datetime.now(timezone.utc) + timedelta(seconds=auth_response.session.expires_in)).isoformat(),
-                "last_active_at": datetime.now(timezone.utc).isoformat()
-            }
-
-            # Add device info if available
-            if device_info:
-                # Convert device info to JSONB format
-                session_data["device_info"] = json.dumps(device_info)
-                if "ip_address" in device_info:
-                    session_data["ip_address"] = device_info["ip_address"]
-
-            try:
-                admin_client.table("user_sessions").insert(session_data).execute()
-            except Exception as e:
-                # If session recording fails, log it but don't fail the login
-                logger.error(f"Failed to record session: {str(e)}")
-                # Continue with login process
-
-            # Get user preferences to check onboarding status
-            preferences_response = admin_client.table("user_preferences").select("*").eq("user_id", user_id).execute()
-            preferences_data = preferences_response.data[0] if len(preferences_response.data) > 0 else {}
-
-            # Create a serializable version of the user and session
-            user_metadata = auth_response.user.user_metadata or {}
-            user_data = {
-                "id": auth_response.user.id,
-                "email": auth_response.user.email,
-                "full_name": user_metadata.get("full_name") or user_metadata.get("name"),
-                "email_verified": True,
-                "onboarding_completed": preferences_data.get("onboarding_completed", False)
-            }
-
-            session_data = None
-            if auth_response.session:
-                session_data = {
-                    "access_token": auth_response.session.access_token,
-                    "refresh_token": auth_response.session.refresh_token,
-                    "expires_in": auth_response.session.expires_in,
-                    "token_type": auth_response.session.token_type
-                }
-
-            return {
-                "user": user_data,
-                "session": session_data,
-                "message": "Google login successful"
-            }
-
+            payload = cls.verify_jwt_token(token)
+            if not payload:
+                return None
+            
+            user_id = payload.get('user_id')
+            if not user_id:
+                return None
+            
+            user = User.query.get(user_id)
+            return user
+            
         except Exception as e:
-            logger.error(f"Error during Google login: {str(e)}")
-            abort(500, description=f"Error during Google login: {str(e)}")
+            logger.error(f"Error getting current user: {str(e)}")
+            return None
 
     @classmethod
-    async def login_with_facebook(cls, access_token: str, device_info: Dict[str, Any] = None) -> Dict[str, Any]:
+    def logout_user(cls, token: str) -> bool:
         """
-        Authenticate a user with Facebook OAuth.
-
+        Logout a user by invalidating their session.
+        
         Args:
-            access_token: Facebook OAuth access token
-            device_info: Dictionary containing device and browser information
-
+            token: JWT token
+            
         Returns:
-            Dict containing user data and session
-
-        Raises:
-            Flask abort: If authentication fails
+            bool: True if logout successful, False otherwise
         """
         try:
-            supabase = cls.get_supabase_client()
-
-            # Sign in with Facebook OAuth token
-            auth_response = supabase.auth.sign_in_with_oauth({
-                "provider": "facebook",
-                "access_token": access_token
-            })
-
-            if not auth_response.user:
-                abort(401, description="Facebook authentication failed")
-
-            user_id = auth_response.user.id
-            email = auth_response.user.email
-
-            # Check if user exists in our database
-            admin_client = cls.get_admin_client()
-            user_response = admin_client.table("users").select("*").eq("user_id", user_id).execute()
-
-            if len(user_response.data) == 0:
-                # Get user metadata
-                user_metadata = auth_response.user.user_metadata or {}
-                display_name = user_metadata.get("full_name") or user_metadata.get("name") or email.split("@")[0]
-
-                # First-time Facebook login, create user profile
-                user_data = {
-                    "user_id": user_id,
-                    "email": email,
-                    "password_hash": "facebook_oauth",  # Placeholder for OAuth users
-                    "full_name": display_name,
-                    "created_at": datetime.now(timezone.utc).isoformat(),
-                    "updated_at": datetime.now(timezone.utc).isoformat(),
-                    "email_verified": True
-                }
-
-                admin_client.table("users").insert(user_data).execute()
-
-                # Create default user preferences
-                preferences_data = {
-                    "user_id": user_id,
-                    "created_at": datetime.now(timezone.utc).isoformat(),
-                    "updated_at": datetime.now(timezone.utc).isoformat()
-                }
-
-                admin_client.table("user_preferences").insert(preferences_data).execute()
-            else:
-                # Update last login timestamp
-                admin_client.table("users").update({
-                    "last_login_at": datetime.now(timezone.utc).isoformat()
-                }).eq("user_id", user_id).execute()
-
-            # Record session - use a truncated or hashed token to fit in VARCHAR(255)
-            # We'll use the first 32 characters of the token as an identifier
-            token_identifier = auth_response.session.access_token[:32]
-
-            # Prepare session data
-            session_data = {
-                "user_id": user_id,
-                "token": token_identifier,
-                "created_at": datetime.now(timezone.utc).isoformat(),
-                "expires_at": (datetime.now(timezone.utc) + timedelta(seconds=auth_response.session.expires_in)).isoformat(),
-                "last_active_at": datetime.now(timezone.utc).isoformat()
-            }
-
-            # Add device info if available
-            if device_info:
-                # Convert device info to JSONB format
-                session_data["device_info"] = json.dumps(device_info)
-                if "ip_address" in device_info:
-                    session_data["ip_address"] = device_info["ip_address"]
-
-            try:
-                admin_client.table("user_sessions").insert(session_data).execute()
-            except Exception as e:
-                # If session recording fails, log it but don't fail the login
-                logger.error(f"Failed to record session: {str(e)}")
-                # Continue with login process
-
-            # Get user preferences to check onboarding status
-            preferences_response = admin_client.table("user_preferences").select("*").eq("user_id", user_id).execute()
-            preferences_data = preferences_response.data[0] if len(preferences_response.data) > 0 else {}
-
-            # Create a serializable version of the user and session
-            user_metadata = auth_response.user.user_metadata or {}
-            user_data = {
-                "id": auth_response.user.id,
-                "email": auth_response.user.email,
-                "full_name": user_metadata.get("full_name") or user_metadata.get("name"),
-                "email_verified": True,
-                "onboarding_completed": preferences_data.get("onboarding_completed", False)
-            }
-
-            session_data = None
-            if auth_response.session:
-                session_data = {
-                    "access_token": auth_response.session.access_token,
-                    "refresh_token": auth_response.session.refresh_token,
-                    "expires_in": auth_response.session.expires_in,
-                    "token_type": auth_response.session.token_type
-                }
-
-            return {
-                "user": user_data,
-                "session": session_data,
-                "message": "Facebook login successful"
-            }
-
+            # Find and delete session
+            token_identifier = token[:32]
+            session = UserSession.query.filter_by(token=token_identifier).first()
+            
+            if session:
+                db.session.delete(session)
+                db.session.commit()
+                return True
+            
+            return False
+            
         except Exception as e:
-            logger.error(f"Error during Facebook login: {str(e)}")
-            abort(500, description=f"Error during Facebook login: {str(e)}")
-
-    @classmethod
-    async def logout(cls, access_token: str) -> Dict[str, str]:
-        """
-        Log out a user and invalidate their session.
-
-        Args:
-            access_token: User's access token
-
-        Returns:
-            Dict with success message
-
-        Raises:
-            Flask abort: If logout fails
-        """
-        try:
-            supabase = cls.get_supabase_client()
-
-            # Sign out from Supabase Auth
-            supabase.auth.sign_out()
-
-            # Invalidate session in our database
-            # Use the same truncation method as in login
-            token_identifier = access_token[:32]
-
-            admin_client = cls.get_admin_client()
-            try:
-                admin_client.table("user_sessions").update({
-                    "expires_at": datetime.now(timezone.utc).isoformat()
-                }).eq("token", token_identifier).execute()
-            except Exception as e:
-                # If session invalidation fails, log it but don't fail the logout
-                logger.error(f"Failed to invalidate session: {str(e)}")
-                # Continue with logout process
-
-            return {"message": "Logout successful"}
-
-        except Exception as e:
+            db.session.rollback()
             logger.error(f"Error during logout: {str(e)}")
-            abort(500, description=f"Error during logout: {str(e)}")
+            return False
 
     @classmethod
-    async def reset_password_request(cls, email: str) -> Dict[str, str]:
+    def change_password(cls, user_id: str, current_password: str, new_password: str) -> bool:
         """
-        Request a password reset for a user.
-
+        Change a user's password.
+        
         Args:
-            email: User's email address
-
+            user_id: User ID
+            current_password: Current password
+            new_password: New password
+            
         Returns:
-            Dict with success message
-
+            bool: True if password changed successfully
+            
         Raises:
-            Flask abort: If request fails
+            Flask abort: If password change fails
         """
         try:
-            supabase = cls.get_supabase_client()
-
-            # Send password reset email
-            supabase.auth.reset_password_email(email)
-
-            return {"message": "Password reset instructions sent to your email"}
-
+            user = User.query.get(user_id)
+            if not user:
+                abort(404, description="User not found")
+            
+            # Verify current password
+            if not cls.verify_password(current_password, user.password_hash):
+                abort(401, description="Current password is incorrect")
+            
+            # Update password
+            user.password_hash = cls.hash_password(new_password)
+            user.updated_at = datetime.now(timezone.utc)
+            db.session.commit()
+            
+            return True
+            
         except Exception as e:
-            logger.error(f"Error during password reset request: {str(e)}")
-            # Don't reveal if email exists or not for security
-            return {"message": "If your email is registered, you will receive password reset instructions"}
+            db.session.rollback()
+            logger.error(f"Error changing password: {str(e)}")
+            abort(500, description="Internal server error")
 
     @classmethod
-    async def verify_email(cls, token: str) -> Dict[str, str]:
+    def update_user_profile(cls, user_id: str, **kwargs) -> Dict[str, Any]:
         """
-        Verify a user's email address.
+        Update user profile information.
+        
+        Args:
+            user_id: User ID
+            **kwargs: Profile fields to update
+            
+        Returns:
+            Dict containing updated user data
+            
+        Raises:
+            Flask abort: If update fails
+        """
+        try:
+            user = User.query.get(user_id)
+            if not user:
+                abort(404, description="User not found")
+            
+            # Update allowed fields
+            allowed_fields = ['username', 'full_name', 'profile_image_url']
+            for field, value in kwargs.items():
+                if field in allowed_fields and value is not None:
+                    setattr(user, field, value)
+            
+            user.updated_at = datetime.now(timezone.utc)
+            db.session.commit()
+            
+            return {
+                "user_id": user.user_id,
+                "email": user.email,
+                "username": user.username,
+                "full_name": user.full_name,
+                "profile_image_url": user.profile_image_url,
+                "account_status": user.account_status,
+                "email_verified": user.email_verified,
+                "updated_at": user.updated_at.isoformat()
+            }
+            
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Error updating user profile: {str(e)}")
+            abort(500, description="Internal server error")
+
+    @classmethod
+    def verify_email(cls, token: str) -> Dict[str, Any]:
+        """
+        Verify a user's email address using a verification token
 
         Args:
             token: Email verification token
 
         Returns:
-            Dict with success message
+            Dict containing verification result
 
         Raises:
             Flask abort: If verification fails
         """
         try:
-            # This is handled by Supabase Auth directly via email link
-            # We just need to update our database to reflect the verified status
+            from app.utils.token_utils import TokenManager
+            from app.services.email_service import EmailService
 
-            # Decode the token to get user_id
-            payload = jwt.decode(token, AppConfig.JWT_SECRET, algorithms=[AppConfig.JWT_ALGORITHM])
-            user_id = payload.get("sub")
+            # Verify the token
+            payload = TokenManager.verify_verification_token(token)
+            if not payload:
+                abort(400, description="Invalid or expired verification token")
 
-            if not user_id:
-                abort(400, description="Invalid verification token")
+            user_id = payload.get('user_id')
+            email = payload.get('email')
 
-            # Update email_verified status
-            admin_client = cls.get_admin_client()
-            admin_client.table("users").update({
-                "email_verified": True,
-                "updated_at": datetime.now(timezone.utc).isoformat()
-            }).eq("user_id", user_id).execute()
+            if not user_id or not email:
+                abort(400, description="Invalid token payload")
 
-            return {"message": "Email verified successfully"}
-
-        except jwt.PyJWTError:
-            abort(400, description="Invalid or expired verification token")
-        except Exception as e:
-            logger.error(f"Error during email verification: {str(e)}")
-            abort(500, description=f"Error during email verification: {str(e)}")
-
-    @classmethod
-    async def get_user_profile(cls, user_id: str) -> Dict[str, Any]:
-        """
-        Get a user's profile information.
-
-        Args:
-            user_id: User's ID
-
-        Returns:
-            Dict containing user profile data
-
-        Raises:
-            Flask abort: If retrieval fails
-        """
-        try:
-            admin_client = cls.get_admin_client()
-
-            # Get user data
-            user_response = admin_client.table("users").select("*").eq("user_id", user_id).execute()
-
-            if len(user_response.data) == 0:
+            # Find the user
+            user = User.query.get(user_id)
+            if not user:
                 abort(404, description="User not found")
 
-            # Get user preferences
-            preferences_response = admin_client.table("user_preferences").select("*").eq("user_id", user_id).execute()
+            # Check if email matches
+            if user.email != email:
+                abort(400, description="Token email does not match user email")
 
-            user_data = user_response.data[0]
-            preferences_data = preferences_response.data[0] if len(preferences_response.data) > 0 else {}
+            # Check if already verified
+            if user.email_verified:
+                return {
+                    "message": "Email already verified",
+                    "user": {
+                        "user_id": user.user_id,
+                        "email": user.email,
+                        "email_verified": True
+                    }
+                }
 
-            # Combine user data and preferences
-            profile = {
-                "user_id": user_data.get("user_id"),
-                "email": user_data.get("email"),
-                "username": user_data.get("username"),
-                "full_name": user_data.get("full_name"),
-                "profile_image_url": user_data.get("profile_image_url"),
-                "email_verified": user_data.get("email_verified"),
-                "account_status": user_data.get("account_status"),
-                "created_at": user_data.get("created_at"),
-                "onboarding_completed": preferences_data.get("onboarding_completed", False),
-                "preferences": preferences_data
+            # Mark email as verified
+            user.email_verified = True
+            user.updated_at = datetime.now(timezone.utc)
+            db.session.commit()
+
+            # Send welcome email
+            EmailService.send_welcome_email(user.email, user.full_name)
+
+            logger.info(f"Email verified successfully for user {user_id}")
+
+            return {
+                "message": "Email verified successfully",
+                "user": {
+                    "user_id": user.user_id,
+                    "email": user.email,
+                    "full_name": user.full_name,
+                    "email_verified": True
+                }
             }
 
-            return profile
-
         except Exception as e:
-            logger.error(f"Error retrieving user profile: {str(e)}")
-            abort(500, description=f"Error retrieving user profile: {str(e)}")
+            db.session.rollback()
+            logger.error(f"Error verifying email: {str(e)}")
+            abort(500, description="Internal server error")
 
     @classmethod
-    async def change_password(cls, user_id: str, current_password: str, new_password: str) -> Dict[str, str]:
+    def resend_verification_email(cls, email: str) -> Dict[str, Any]:
         """
-        Change a user's password.
+        Resend verification email to a user
 
         Args:
-            user_id: User's ID
-            current_password: User's current password
-            new_password: User's new password
+            email: User's email address
 
         Returns:
-            Dict with success message
+            Dict containing result message
 
         Raises:
-            Flask abort: If password change fails
+            Flask abort: If resend fails
         """
         try:
-            supabase = cls.get_supabase_client()
-            admin_client = cls.get_admin_client()
+            from app.services.email_service import EmailService
 
-            # First, verify the current password by attempting to sign in
-            # Get the user's email
-            user_response = admin_client.table("users").select("email").eq("user_id", user_id).execute()
-
-            if not user_response.data or len(user_response.data) == 0:
+            # Find user by email
+            user = User.query.filter_by(email=email).first()
+            if not user:
                 abort(404, description="User not found")
 
-            email = user_response.data[0].get("email")
+            # Check if already verified
+            if user.email_verified:
+                abort(400, description="Email is already verified")
 
-            # Try to authenticate with current password
-            try:
-                auth_response = supabase.auth.sign_in_with_password({
-                    "email": email,
-                    "password": current_password
-                })
+            # Send verification email
+            success = EmailService.send_verification_email(user.user_id, user.email, user.full_name)
 
-                if not auth_response.user:
-                    abort(401, description="Current password is incorrect")
-            except Exception as e:
-                logger.error(f"Authentication error during password change: {str(e)}")
-                abort(401, description="Current password is incorrect")
+            if not success:
+                logger.warning(f"Failed to send verification email to {email}, but continuing...")
+                # Don't abort - user can still request resend later
 
-            # If authentication succeeded, update the password
-            # Use the admin API to update the user's password
-            auth_user = supabase.auth.admin.update_user_by_id(
-                user_id,
-                {"password": new_password}
-            )
+            logger.info(f"Verification email resent to {email}")
 
-            if not auth_user:
-                abort(500, description="Failed to update password")
-
-            return {"message": "Password changed successfully"}
+            return {
+                "message": "Verification email sent successfully"
+            }
 
         except Exception as e:
-            logger.error(f"Error during password change: {str(e)}")
-            if "401" in str(e) or "incorrect" in str(e).lower():
-                abort(401, description="Current password is incorrect")
-            abort(500, description=f"Error changing password: {str(e)}")
-
-    @classmethod
-    async def update_user_profile(cls, user_id: str, profile_data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Update a user's profile information.
-
-        Args:
-            user_id: User's ID
-            profile_data: Dict containing profile data to update
-
-        Returns:
-            Dict containing updated user profile data
-
-        Raises:
-            Flask abort: If update fails
-        """
-        try:
-            admin_client = cls.get_admin_client()
-
-            # Separate user data and preferences
-            user_updates = {}
-            preference_updates = {}
-
-            # Fields that can be updated in the users table
-            user_fields = ["username", "full_name", "profile_image_url"]
-
-            # Fields that can be updated in the user_preferences table
-            preference_fields = ["currency", "language", "theme", "notification_email", "notification_push"]
-
-            # Check if onboarding_completed is in the profile_data
-            if "onboarding_completed" in profile_data:
-                try:
-                    # Try to update onboarding_completed
-                    admin_client.table("user_preferences").update({
-                        "onboarding_completed": profile_data["onboarding_completed"]
-                    }).eq("user_id", user_id).execute()
-                except Exception as e:
-                    # If it fails, log the error but continue with other updates
-                    logger.error(f"Error updating onboarding_completed: {str(e)}")
-                    # Remove it from profile_data to prevent further errors
-                    profile_data.pop("onboarding_completed", None)
-
-            for key, value in profile_data.items():
-                if key in user_fields:
-                    user_updates[key] = value
-                elif key in preference_fields:
-                    preference_updates[key] = value
-
-            # Add updated_at timestamp
-            if user_updates:
-                user_updates["updated_at"] = datetime.now(timezone.utc).isoformat()
-
-                # Update user data
-                admin_client.table("users").update(user_updates).eq("user_id", user_id).execute()
-
-            if preference_updates:
-                preference_updates["updated_at"] = datetime.now(timezone.utc).isoformat()
-
-                # Update user preferences
-                admin_client.table("user_preferences").update(preference_updates).eq("user_id", user_id).execute()
-
-            # Get updated profile
-            return await cls.get_user_profile(user_id)
-
-        except Exception as e:
-            logger.error(f"Error updating user profile: {str(e)}")
-            abort(500, description=f"Error updating user profile: {str(e)}")
+            logger.error(f"Error resending verification email: {str(e)}")
+            abort(500, description="Internal server error")

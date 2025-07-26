@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Bell, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import ThemeToggle from '../common/ThemeToggle';
 import SearchBar from '../common/SearchBar';
 import { motion } from 'framer-motion';
@@ -7,10 +8,13 @@ import { useAuth } from '../../context/AuthContext';
 
 const DashboardHeader = () => {
   const { user, userProfile } = useAuth();
+  const navigate = useNavigate();
 
   const handleSearch = (query) => {
-    // Implement search functionality here
-    console.log('Searching for:', query);
+    if (query.trim()) {
+      // Navigate to dashboard search page with the query
+      navigate(`/dashboard/search?q=${encodeURIComponent(query.trim())}`);
+    }
   };
 
   return (

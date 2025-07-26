@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from flask import jsonify, request, Blueprint
 from app.services.auth import AuthService
@@ -25,8 +24,7 @@ def signup():
         return jsonify({'error': 'Email and password are required'}), 400
 
     try:
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(AuthService.signup_with_email(email, password, full_name))
+        result = AuthService.register_user(email, password, full_name=full_name)
         return jsonify(result), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -56,8 +54,7 @@ def login():
     }
 
     try:
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(AuthService.login_with_email(email, password, device_info))
+        result = AuthService.login_with_email(email, password, device_info)
         return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -82,64 +79,63 @@ def parse_user_agent(user_agent_string):
     return browser
 
 
-@auth.route('/google', methods=['POST'])
-def google_login():
-    """
-    Authenticate a user with Google OAuth.
-    """
-    data = get_request_data(request)
-    access_token = data.get('access_token')
+# TODO: Implement OAuth functionality
+# @auth.route('/google', methods=['POST'])
+# def google_login():
+#     """
+#     Authenticate a user with Google OAuth.
+#     """
+#     data = get_request_data(request)
+#     access_token = data.get('access_token')
 
-    if not access_token:
-        return jsonify({'error': 'Access token is required'}), 400
+#     if not access_token:
+#         return jsonify({'error': 'Access token is required'}), 400
 
-    # Get device info and IP address
-    user_agent = request.headers.get('User-Agent', '')
-    ip_address = request.remote_addr
+#     # Get device info and IP address
+#     user_agent = request.headers.get('User-Agent', '')
+#     ip_address = request.remote_addr
 
-    # Parse device info from user agent
-    device_info = {
-        'user_agent': user_agent,
-        'browser': parse_user_agent(user_agent),
-        'ip_address': ip_address
-    }
+#     # Parse device info from user agent
+#     device_info = {
+#         'user_agent': user_agent,
+#         'browser': parse_user_agent(user_agent),
+#         'ip_address': ip_address
+#     }
 
-    try:
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(AuthService.login_with_google(access_token, device_info))
-        return jsonify(result), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+#     try:
+#         result = AuthService.login_with_google(access_token, device_info)
+#         return jsonify(result), 200
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 500
 
 
-@auth.route('/facebook', methods=['POST'])
-def facebook_login():
-    """
-    Authenticate a user with Facebook OAuth.
-    """
-    data = get_request_data(request)
-    access_token = data.get('access_token')
+# @auth.route('/facebook', methods=['POST'])
+# def facebook_login():
+#     """
+#     Authenticate a user with Facebook OAuth.
+#     """
+#     data = get_request_data(request)
+#     access_token = data.get('access_token')
 
-    if not access_token:
-        return jsonify({'error': 'Access token is required'}), 400
+#     if not access_token:
+#         return jsonify({'error': 'Access token is required'}), 400
 
-    # Get device info and IP address
-    user_agent = request.headers.get('User-Agent', '')
-    ip_address = request.remote_addr
+#     # Get device info and IP address
+#     user_agent = request.headers.get('User-Agent', '')
+#     ip_address = request.remote_addr
 
-    # Parse device info from user agent
-    device_info = {
-        'user_agent': user_agent,
-        'browser': parse_user_agent(user_agent),
-        'ip_address': ip_address
-    }
+#     # Parse device info from user agent
+#     device_info = {
+#         'user_agent': user_agent,
+#         'browser': parse_user_agent(user_agent),
+#         'ip_address': ip_address
+#     }
 
-    try:
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(AuthService.login_with_facebook(access_token, device_info))
-        return jsonify(result), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+#     try:
+#         result = AuthService.login_with_facebook(access_token, device_info)
+#         return jsonify(result), 200
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 500
 
 
 @auth.route('/logout', methods=['POST'])
@@ -154,28 +150,8 @@ def logout():
         return jsonify({'error': 'Access token is required'}), 400
 
     try:
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(AuthService.logout(access_token))
-        return jsonify(result), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
-@auth.route('/forgot-password', methods=['POST'])
-def forgot_password():
-    """
-    Request a password reset for a user.
-    """
-    data = get_request_data(request)
-    email = data.get('email')
-
-    if not email:
-        return jsonify({'error': 'Email is required'}), 400
-
-    try:
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(AuthService.reset_password_request(email))
-        return jsonify(result), 200
+        result = AuthService.logout_user(access_token)
+        return jsonify({"message": "Logged out successfully"}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -192,11 +168,47 @@ def verify_email():
         return jsonify({'error': 'Token is required'}), 400
 
     try:
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(AuthService.verify_email(token))
+        result = AuthService.verify_email(token)
         return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@auth.route('/resend-verification', methods=['POST'])
+def resend_verification():
+    """
+    Resend verification email to a user.
+    """
+    data = get_request_data(request)
+    email = data.get('email')
+
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+
+    try:
+        result = AuthService.resend_verification_email(email)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# TODO: Implement password reset functionality
+# @auth.route('/forgot-password', methods=['POST'])
+# def forgot_password():
+#     """
+#     Request a password reset for a user.
+#     """
+#     data = get_request_data(request)
+#     email = data.get('email')
+
+#     if not email:
+#         return jsonify({'error': 'Email is required'}), 400
+
+#     try:
+#         result = AuthService.reset_password_request(email)
+#         return jsonify(result), 200
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 500
 
 
 @auth.route('/profile/<user_id>', methods=['GET'])
@@ -205,8 +217,7 @@ def get_user_profile(user_id):
     Get a user's profile information.
     """
     try:
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(AuthService.get_user_profile(user_id))
+        result = AuthService.get_user_profile(user_id)
         return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -220,8 +231,7 @@ def update_user_profile(user_id):
     data = get_request_data(request)
 
     try:
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(AuthService.update_user_profile(user_id, data))
+        result = AuthService.update_user_profile(user_id, data)
         return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -233,8 +243,7 @@ def complete_onboarding(user_id):
     Mark a user's onboarding as completed.
     """
     try:
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(AuthService.update_user_profile(user_id, {"onboarding_completed": True}))
+        result = AuthService.update_user_profile(user_id, {"onboarding_completed": True})
         return jsonify({"message": "Onboarding completed successfully", "user": result}), 200
     except Exception as e:
         # Even if there's an error, we'll consider onboarding complete
@@ -243,7 +252,7 @@ def complete_onboarding(user_id):
 
         try:
             # Get the user profile without updating it
-            result = asyncio.run(AuthService.get_user_profile(user_id))
+            result = AuthService.get_user_profile(user_id)
             # Add the onboarding_completed flag manually
             if isinstance(result, dict):
                 result["onboarding_completed"] = True
@@ -266,8 +275,7 @@ def change_password():
         return jsonify({'error': 'User ID, current password, and new password are required'}), 400
 
     try:
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(AuthService.change_password(user_id, current_password, new_password))
+        result = AuthService.change_password(user_id, current_password, new_password)
         return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -292,8 +300,7 @@ def update_notification_settings():
             "notification_push": notification_settings.get('push', True)
         }
 
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(AuthService.update_user_profile(user_id, notification_updates))
+        result = AuthService.update_user_profile(user_id, notification_updates)
         return jsonify({"message": "Notification settings updated successfully", "user": result}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500

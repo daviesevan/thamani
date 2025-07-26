@@ -2,26 +2,19 @@ import logging
 from typing import Dict, Any, Optional
 from flask import abort
 from datetime import datetime, timezone
-from app.config.app_config import AppConfig
-from app.services.auth import AuthService
+from app.extensions.extensions import db
+from app.models.user import UserPreference
 
 # Set up logger
 logger = logging.getLogger(__name__)
 
 class SettingsService:
     """
-    Service for managing user settings and preferences
+    Service for managing user settings and preferences using SQLAlchemy
     """
 
     @classmethod
-    def get_admin_client(cls):
-        """
-        Get the Supabase admin client for database operations
-        """
-        return AuthService.get_admin_client()
-
-    @classmethod
-    async def get_user_settings(cls, user_id: str) -> Dict[str, Any]:
+    def get_user_settings(cls, user_id: str) -> Dict[str, Any]:
         """
         Get a user's settings and preferences
 
@@ -35,35 +28,43 @@ class SettingsService:
             Flask abort: If retrieval fails
         """
         try:
-            admin_client = cls.get_admin_client()
+            # Get user preferences from database
+            preferences = UserPreference.query.filter_by(user_id=user_id).first()
 
-            # Get user preferences
-            preferences_response = admin_client.table("user_preferences").select("*").eq("user_id", user_id).execute()
-
-            if not preferences_response.data or len(preferences_response.data) == 0:
+            if not preferences:
                 # Create default preferences if they don't exist
-                default_preferences = {
-                    "user_id": user_id,
-                    "currency": "KES",
-                    "language": "en",
-                    "theme": "light",
-                    "notification_email": True,
-                    "notification_push": True,
-                    "created_at": datetime.now(timezone.utc).isoformat(),
-                    "updated_at": datetime.now(timezone.utc).isoformat()
-                }
+                preferences = UserPreference(
+                    user_id=user_id,
+                    currency="KES",
+                    language="en",
+                    theme="light",
+                    notification_email=True,
+                    notification_push=True,
+                    onboarding_completed=False
+                )
+                db.session.add(preferences)
+                db.session.commit()
 
-                admin_client.table("user_preferences").insert(default_preferences).execute()
-                return default_preferences
-
-            return preferences_response.data[0]
+            # Convert to dictionary
+            return {
+                "user_id": preferences.user_id,
+                "currency": preferences.currency,
+                "language": preferences.language,
+                "theme": preferences.theme,
+                "notification_email": preferences.notification_email,
+                "notification_push": preferences.notification_push,
+                "onboarding_completed": preferences.onboarding_completed,
+                "created_at": preferences.created_at.isoformat() if preferences.created_at else None,
+                "updated_at": preferences.updated_at.isoformat() if preferences.updated_at else None
+            }
 
         except Exception as e:
             logger.error(f"Error retrieving user settings: {str(e)}")
+            db.session.rollback()
             abort(500, description=f"Error retrieving user settings: {str(e)}")
 
     @classmethod
-    async def update_user_settings(cls, user_id: str, settings_data: Dict[str, Any]) -> Dict[str, Any]:
+    def update_user_settings(cls, user_id: str, settings_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Update a user's settings and preferences
 
@@ -80,15 +81,14 @@ class SettingsService:
         logger.info(f"Updating settings for user {user_id}: {settings_data}")
 
         try:
-            admin_client = cls.get_admin_client()
-
             # Fields that can be updated in the user_preferences table
             allowed_fields = [
                 "currency",
                 "language",
                 "theme",
                 "notification_email",
-                "notification_push"
+                "notification_push",
+                "onboarding_completed"
             ]
 
             # Filter out fields that are not allowed to be updated
@@ -96,39 +96,41 @@ class SettingsService:
 
             logger.info(f"Filtered updates: {updates}")
 
-            # Add updated_at timestamp
             if updates:
-                updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+                # Get or create user preferences
+                preferences = UserPreference.query.filter_by(user_id=user_id).first()
 
-                # Check if preferences exist for the user
-                preferences_response = admin_client.table("user_preferences").select("*").eq("user_id", user_id).execute()
-
-                if not preferences_response.data or len(preferences_response.data) == 0:
+                if not preferences:
                     # Create new preferences if they don't exist
                     logger.info(f"Creating new preferences for user {user_id}")
-                    updates["user_id"] = user_id
-                    updates["created_at"] = datetime.now(timezone.utc).isoformat()
-                    insert_response = admin_client.table("user_preferences").insert(updates).execute()
-                    logger.info(f"Insert response: {insert_response.data}")
-                else:
-                    # Update existing preferences
-                    logger.info(f"Updating existing preferences for user {user_id}")
-                    update_response = admin_client.table("user_preferences").update(updates).eq("user_id", user_id).execute()
-                    logger.info(f"Update response: {update_response.data}")
+                    preferences = UserPreference(user_id=user_id)
+                    db.session.add(preferences)
+
+                # Update the preferences
+                logger.info(f"Updating preferences for user {user_id}")
+                for field, value in updates.items():
+                    setattr(preferences, field, value)
+
+                # Update timestamp
+                preferences.updated_at = datetime.now(timezone.utc)
+
+                db.session.commit()
+                logger.info(f"Successfully updated preferences for user {user_id}")
             else:
                 logger.warning(f"No valid fields to update for user {user_id}")
 
             # Get updated settings
-            updated_settings = await cls.get_user_settings(user_id)
+            updated_settings = cls.get_user_settings(user_id)
             logger.info(f"Updated settings: {updated_settings}")
             return updated_settings
 
         except Exception as e:
             logger.error(f"Error updating user settings: {str(e)}", exc_info=True)
+            db.session.rollback()
             abort(500, description=f"Error updating user settings: {str(e)}")
 
     @classmethod
-    async def update_theme_setting(cls, user_id: str, theme: str) -> Dict[str, Any]:
+    def update_theme_setting(cls, user_id: str, theme: str) -> Dict[str, Any]:
         """
         Update a user's theme preference
 
@@ -145,10 +147,10 @@ class SettingsService:
         if theme not in ['light', 'dark', 'system']:
             abort(400, description="Invalid theme value. Must be 'light', 'dark', or 'system'")
 
-        return await cls.update_user_settings(user_id, {"theme": theme})
+        return cls.update_user_settings(user_id, {"theme": theme})
 
     @classmethod
-    async def update_notification_settings(cls, user_id: str, email_enabled: bool, push_enabled: bool) -> Dict[str, Any]:
+    def update_notification_settings(cls, user_id: str, email_enabled: bool, push_enabled: bool) -> Dict[str, Any]:
         """
         Update a user's notification settings
 
@@ -168,10 +170,10 @@ class SettingsService:
             "notification_push": push_enabled
         }
 
-        return await cls.update_user_settings(user_id, updates)
+        return cls.update_user_settings(user_id, updates)
 
     @classmethod
-    async def update_currency_setting(cls, user_id: str, currency: str) -> Dict[str, Any]:
+    def update_currency_setting(cls, user_id: str, currency: str) -> Dict[str, Any]:
         """
         Update a user's currency preference
 
@@ -190,10 +192,10 @@ class SettingsService:
         if currency not in valid_currencies:
             abort(400, description=f"Invalid currency code. Supported currencies are: {', '.join(valid_currencies)}")
 
-        return await cls.update_user_settings(user_id, {"currency": currency})
+        return cls.update_user_settings(user_id, {"currency": currency})
 
     @classmethod
-    async def update_language_setting(cls, user_id: str, language: str) -> Dict[str, Any]:
+    def update_language_setting(cls, user_id: str, language: str) -> Dict[str, Any]:
         """
         Update a user's language preference
 
@@ -212,4 +214,4 @@ class SettingsService:
         if language not in valid_languages:
             abort(400, description=f"Invalid language code. Supported languages are: {', '.join(valid_languages)}")
 
-        return await cls.update_user_settings(user_id, {"language": language})
+        return cls.update_user_settings(user_id, {"language": language})

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
@@ -8,6 +9,9 @@ import LoaderDemo from './pages/LoaderDemo';
 import VerificationSuccess from './pages/VerificationSuccess';
 import Dashboard from './pages/Dashboard';
 import Settings from './pages/Settings';
+import ProductSearch from './pages/ProductSearch';
+import ProductDetail from './pages/ProductDetail';
+import TrackedProducts from './pages/TrackedProducts';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 
 /**
@@ -49,6 +53,18 @@ const routes = [
     element: <VerificationSuccess />,
     exact: true,
   },
+  // Redirect old search route to new dashboard search
+  {
+    path: '/products/search',
+    element: <Navigate to="/dashboard/search" replace />,
+    exact: true,
+  },
+  // Product detail route (standalone)
+  {
+    path: '/products/:productId',
+    element: <ProductDetail />,
+    exact: true,
+  },
   // Dashboard routes
   {
     path: '/dashboard',
@@ -62,7 +78,12 @@ const routes = [
       },
       {
         path: 'products',
-        element: <div className="p-4">Products Page (Coming Soon)</div>,
+        element: <TrackedProducts />,
+        exact: true,
+      },
+      {
+        path: 'search',
+        element: <ProductSearch />,
         exact: true,
       },
       {

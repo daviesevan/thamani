@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from flask import Blueprint, jsonify, request
 from app.services.settings import SettingsService
@@ -17,8 +16,7 @@ def get_user_settings(user_id):
     Get a user's settings and preferences.
     """
     try:
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(SettingsService.get_user_settings(user_id))
+        result = SettingsService.get_user_settings(user_id)
         return jsonify(result), 200
     except Exception as e:
         logger.error(f"Error getting user settings: {str(e)}")
@@ -40,8 +38,7 @@ def update_user_settings(user_id):
     logger.info(f"Request data: {data}")
 
     try:
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(SettingsService.update_user_settings(user_id, data))
+        result = SettingsService.update_user_settings(user_id, data)
         logger.info(f"Settings updated successfully for user {user_id}")
         return jsonify(result), 200
     except Exception as e:
@@ -65,8 +62,7 @@ def update_theme_setting(user_id):
         return jsonify({'error': 'Theme value is required'}), 400
 
     try:
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(SettingsService.update_theme_setting(user_id, theme))
+        result = SettingsService.update_theme_setting(user_id, theme)
         return jsonify(result), 200
     except Exception as e:
         logger.error(f"Error updating theme setting: {str(e)}")
@@ -83,9 +79,8 @@ def update_notification_settings(user_id):
     push_enabled = data.get('push', True)
 
     try:
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(SettingsService.update_notification_settings(
-            user_id, email_enabled, push_enabled))
+        result = SettingsService.update_notification_settings(
+            user_id, email_enabled, push_enabled)
         return jsonify(result), 200
     except Exception as e:
         logger.error(f"Error updating notification settings: {str(e)}")
@@ -104,8 +99,7 @@ def update_currency_setting(user_id):
         return jsonify({'error': 'Currency code is required'}), 400
 
     try:
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(SettingsService.update_currency_setting(user_id, currency))
+        result = SettingsService.update_currency_setting(user_id, currency)
         return jsonify(result), 200
     except Exception as e:
         logger.error(f"Error updating currency setting: {str(e)}")
@@ -124,8 +118,7 @@ def update_language_setting(user_id):
         return jsonify({'error': 'Language code is required'}), 400
 
     try:
-        # Run the async function in the synchronous Flask context
-        result = asyncio.run(SettingsService.update_language_setting(user_id, language))
+        result = SettingsService.update_language_setting(user_id, language)
         return jsonify(result), 200
     except Exception as e:
         logger.error(f"Error updating language setting: {str(e)}")
