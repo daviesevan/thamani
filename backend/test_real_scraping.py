@@ -84,7 +84,7 @@ def test_real_scraping():
             time.sleep(3)
             
         except Exception as e:
-            print(f"   ❌ Error searching '{query}': {str(e)}")
+            print(f"   Error searching '{query}': {str(e)}")
             all_results[query] = {}
     
     print("\n🔄 TESTING PRODUCT COMPARISON")
@@ -122,7 +122,7 @@ def test_real_scraping():
                 print(f"      🎯 Confidence: {match.get('confidence_score', 0):.2f}")
         
         except Exception as e:
-            print(f"   ❌ Error in product comparison: {str(e)}")
+            print(f"   Error in product comparison: {str(e)}")
     
     print("\n🤖 TESTING ANTI-BOT MEASURES")
     print("-" * 40)
@@ -130,19 +130,19 @@ def test_real_scraping():
     try:
         # Test anti-bot session creation
         session = anti_bot.create_session_with_rotation()
-        print("   ✅ Anti-bot session created successfully")
+        print("   Anti-bot session created successfully")
         print(f"   🔧 User-Agent: {session.headers.get('User-Agent', 'N/A')[:60]}...")
         
         # Test smart request
         test_url = "https://www.jumia.co.ke"
         response = anti_bot.smart_request(test_url, session=session, max_retries=1)
         if response and response.status_code == 200:
-            print(f"   ✅ Smart request successful: {response.status_code}")
+            print(f"   Smart request successful: {response.status_code}")
         else:
-            print(f"   ⚠️ Smart request failed or blocked")
+            print(f"   Smart request failed or blocked")
         
     except Exception as e:
-        print(f"   ❌ Error testing anti-bot measures: {str(e)}")
+        print(f"   Error testing anti-bot measures: {str(e)}")
     
     print("\n📈 PERFORMANCE ANALYSIS")
     print("-" * 40)
@@ -217,7 +217,7 @@ def test_real_scraping():
         for rec in recommendations:
             print(f"   {rec}")
     else:
-        print("   ✅ System performing well! Consider scaling up.")
+        print("   System performing well! Consider scaling up.")
     
     print("\n🚀 PRODUCTION READINESS")
     print("-" * 40)
@@ -242,12 +242,12 @@ def test_real_scraping():
     if readiness_score >= 80:
         print("   🎉 System is ready for production deployment!")
     elif readiness_score >= 60:
-        print("   ⚠️ System needs minor improvements before production")
+        print("   System needs minor improvements before production")
     else:
         print("   🔧 System requires significant improvements")
     
     print("\n" + "=" * 60)
-    print("✅ REAL WEB SCRAPING TEST COMPLETED")
+    print("REAL WEB SCRAPING TEST COMPLETED")
     
     # Cleanup
     anti_bot.cleanup()
@@ -266,6 +266,6 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         print("\n\n⏹️ Test interrupted by user")
     except Exception as e:
-        print(f"\n\n❌ Test failed with error: {str(e)}")
+        print(f"\n\nTest failed with error: {str(e)}")
         import traceback
         traceback.print_exc()
