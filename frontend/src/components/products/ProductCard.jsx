@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { trackingService, productUtils } from '../../services/products';
+import wishlistService from '../../services/wishlist';
 import { useToast } from '../../context/ToastContext';
 import { Button } from '../ui/button';
 
 const ProductCard = ({ product, onClick, userId }) => {
   const [isTracking, setIsTracking] = useState(false);
   const [isTracked, setIsTracked] = useState(false);
+  const [isWishlisting, setIsWishlisting] = useState(false);
+  const [isInWishlist, setIsInWishlist] = useState(false);
   const { showToast } = useToast();
 
   const {
@@ -18,6 +21,22 @@ const ProductCard = ({ product, onClick, userId }) => {
     retailers,
     source
   } = product;
+
+  // Check if product is in wishlist when component mounts or userId changes
+  useEffect(() => {
+    const checkWishlistStatus = async () => {
+      if (userId && product_id) {
+        try {
+          const inWishlist = await wishlistService.isProductInWishlist(userId, product_id);
+          setIsInWishlist(inWishlist);
+        } catch (error) {
+          console.error('Error checking wishlist status:', error);
+        }
+      }
+    };
+
+    checkWishlistStatus();
+  }, [userId, product_id]);
 
   const handleTrackProduct = async (e) => {
     e.stopPropagation(); // Prevent card click
@@ -53,6 +72,50 @@ const ProductCard = ({ product, onClick, userId }) => {
       showToast('Error updating product tracking', 'error');
     } finally {
       setIsTracking(false);
+    }
+  };
+
+  const handleWishlistProduct = async (e) => {
+    e.stopPropagation(); // Prevent card click
+
+    if (!userId) {
+      showToast('Please sign in to add products to wishlist', 'error');
+      return;
+    }
+
+    setIsWishlisting(true);
+    try {
+      if (isInWishlist) {
+        // Remove from wishlist
+        const wishlistItem = await wishlistService.getWishlistItemForProduct(userId, product_id);
+        if (wishlistItem) {
+          await wishlistService.removeItemFromWishlist(
+            userId,
+            wishlistItem.wishlist_id,
+            wishlistItem.wishlist_item_id
+          );
+          setIsInWishlist(false);
+          showToast('Product removed from wishlist', 'success');
+        }
+      } else {
+        // Add to wishlist
+        const currentPrice = price_info?.min_price ||
+          (retailers && retailers.length > 0 ? retailers[0].current_price : null);
+
+        await wishlistService.quickAddToWishlist(userId, {
+          product_id: product_id,
+          notes: `Added ${name} to wishlist`,
+          priority: 'medium',
+          target_price: currentPrice
+        });
+        setIsInWishlist(true);
+        showToast('Product added to wishlist', 'success');
+      }
+    } catch (error) {
+      console.error('Error updating wishlist:', error);
+      showToast('Error updating wishlist', 'error');
+    } finally {
+      setIsWishlisting(false);
     }
   };
 
@@ -198,29 +261,50 @@ const ProductCard = ({ product, onClick, userId }) => {
           >
             View Details
           </Button>
-          
+
           {userId && (
-            <Button
-              variant={isTracked ? "destructive" : "default"}
-              size="sm"
-              className="flex-1 text-xs"
-              onClick={handleTrackProduct}
-              disabled={isTracking || source === 'web_scraping'}
-              title={source === 'web_scraping' ? 'Price tracking for live scraped products coming soon' : ''}
-            >
-              {isTracking ? (
-                <div className="flex items-center space-x-1">
-                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>...</span>
-                </div>
-              ) : isTracked ? (
-                'Untrack'
-              ) : source === 'web_scraping' ? (
-                'Track Soon'
-              ) : (
-                'Track Price'
-              )}
-            </Button>
+            <>
+              {/* Wishlist Button */}
+              <Button
+                variant={isInWishlist ? "default" : "outline"}
+                size="sm"
+                className="px-2 text-xs"
+                onClick={handleWishlistProduct}
+                disabled={isWishlisting}
+                title={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+              >
+                {isWishlisting ? (
+                  <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                ) : isInWishlist ? (
+                  <span className="text-red-500">♥</span>
+                ) : (
+                  <span className="text-gray-400">♡</span>
+                )}
+              </Button>
+
+              {/* Track Price Button */}
+              <Button
+                variant={isTracked ? "destructive" : "default"}
+                size="sm"
+                className="flex-1 text-xs"
+                onClick={handleTrackProduct}
+                disabled={isTracking || source === 'web_scraping'}
+                title={source === 'web_scraping' ? 'Price tracking for live scraped products coming soon' : ''}
+              >
+                {isTracking ? (
+                  <div className="flex items-center space-x-1">
+                    <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>...</span>
+                  </div>
+                ) : isTracked ? (
+                  'Untrack'
+                ) : source === 'web_scraping' ? (
+                  'Track Soon'
+                ) : (
+                  'Track Price'
+                )}
+              </Button>
+            </>
           )}
         </div>
       </div>

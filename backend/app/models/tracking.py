@@ -41,22 +41,61 @@ class UserWishlist(db.Model):
     user = relationship("User", back_populates="wishlists")
     items = relationship("WishlistItem", back_populates="wishlist", cascade="all, delete-orphan")
 
+    def to_dict(self):
+        """Convert wishlist to dictionary"""
+        return {
+            'wishlist_id': self.wishlist_id,
+            'user_id': self.user_id,
+            'name': self.name,
+            'description': self.description,
+            'is_default': self.is_default,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'items_count': len(self.items) if self.items else 0
+        }
+
 
 class WishlistItem(db.Model):
     __tablename__ = 'wishlist_items'
-    
+
     wishlist_item_id = Column(Integer, primary_key=True, autoincrement=True)
     wishlist_id = Column(Integer, ForeignKey('user_wishlists.wishlist_id'), nullable=False)
     product_id = Column(Integer, ForeignKey('products.product_id'), nullable=False)
     added_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     target_price = Column(Numeric(10, 2))
-    
+    notes = Column(Text)  # User notes about the wishlist item
+    priority = Column(String(10), default='medium')  # low, medium, high
+
+    # Price tracking when added to wishlist (for scraped products)
+    price_when_added = Column(Numeric(10, 2))
+    currency_code = Column(String(3), default='KES')
+
+    # Source tracking (to know if it came from scraped data)
+    source = Column(String(20), default='database')  # 'database' or 'web_scraping'
+    original_scraped_id = Column(String(100))  # Original scraped product ID if applicable
+
     # Relationships
     wishlist = relationship("UserWishlist", back_populates="items")
     product = relationship("Product", back_populates="wishlist_items")
-    
+
     # Unique constraint
     __table_args__ = (UniqueConstraint('wishlist_id', 'product_id'),)
+
+    def to_dict(self):
+        """Convert wishlist item to dictionary"""
+        return {
+            'wishlist_item_id': self.wishlist_item_id,
+            'wishlist_id': self.wishlist_id,
+            'product_id': self.product_id,
+            'added_at': self.added_at.isoformat() if self.added_at else None,
+            'target_price': float(self.target_price) if self.target_price else None,
+            'notes': self.notes,
+            'priority': self.priority,
+            'price_when_added': float(self.price_when_added) if self.price_when_added else None,
+            'currency_code': self.currency_code,
+            'source': self.source,
+            'original_scraped_id': self.original_scraped_id
+        }
 
 
 class PriceAlert(db.Model):

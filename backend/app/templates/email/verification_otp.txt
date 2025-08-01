@@ -1,0 +1,23 @@
+Hello {% if user_name %}{{ user_name }}{% else %}there{% endif %},
+
+Thank you for signing up with Thamani! To complete your registration and verify your email address {{ email }}, please use the verification code below:
+
+Your Verification Code: {{ otp_code }}
+
+This code expires in {{ expiry_minutes }} minutes.
+
+Enter this code in the verification form to activate your account and start tracking product prices across multiple retailers.
+
+If you didn't create an account with Thamani, you can safely ignore this email.
+
+Security Notice: Never share this verification code with anyone. Thamani will never ask for your verification code via phone or email.
+
+Having trouble?
+• Make sure you're entering the code exactly as shown above
+• The code is case-sensitive and expires in {{ expiry_minutes }} minutes
+• If the code has expired, you can request a new one
+• Contact our support team if you continue to have issues
+
+This email was sent to {{ email }} because you signed up for a Thamani account.
+
+© 2025 Thamani. All rights reserved.

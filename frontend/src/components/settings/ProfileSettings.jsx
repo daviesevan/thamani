@@ -51,12 +51,12 @@ const ProfileSettings = () => {
     setIsLoading(true);
 
     try {
-      if (!user || !user.id) {
+      if (!user || !user.user_id) {
         throw new Error('User not authenticated');
       }
 
-      // Use the updateUserProfile method from AuthContext
-      await updateUserProfile(user.id, formData);
+      // Use the new AuthService updateProfile method
+      await AuthService.updateProfile(formData);
       toast.success('Profile updated successfully');
     } catch (error) {
       console.error('Error updating profile:', error);

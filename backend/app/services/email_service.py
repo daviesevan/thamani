@@ -20,41 +20,40 @@ class EmailService:
     @staticmethod
     def send_verification_email(user_id: str, email: str, user_name: Optional[str] = None) -> bool:
         """
-        Send email verification email to user
-        
+        Send email verification OTP to user
+
         Args:
             user_id: User's ID
             email: User's email address
             user_name: User's name (optional)
-            
+
         Returns:
             bool: True if email sent successfully, False otherwise
         """
         try:
-            # Generate verification token
-            token = TokenManager.generate_verification_token(user_id, email)
-            
-            # Create verification URL
-            frontend_url = current_app.config.get('FRONTEND_URL', 'http://localhost:3000')
-            verification_url = f"{frontend_url}/verify-email?token={token}"
-            
+            # Generate OTP code
+            from app.services.otp_service import OTPService
+            otp_code = OTPService.create_email_verification_otp(user_id, email)
+
             # Prepare email content
-            subject = "Verify Your Email Address - Thamani"
-            
+            subject = "Your Email Verification Code - Thamani"
+
             # Render HTML template
             html_body = render_template(
-                'email/verification.html',
+                'email/verification_otp.html',
                 user_name=user_name,
                 email=email,
-                verification_url=verification_url
+                otp_code=otp_code,
+                expiry_minutes=OTPService.OTP_EXPIRY_MINUTES
             )
             
             # Render text template
             text_body = render_template(
-                'email/verification.txt',
+                'email/verification_otp.txt',
                 user_name=user_name,
                 email=email,
-                verification_url=verification_url
+                otp_code=otp_code,
+                expiry_minutes=OTPService.OTP_EXPIRY_MINUTES
             )
             
             # Create and send email

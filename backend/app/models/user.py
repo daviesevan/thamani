@@ -61,4 +61,34 @@ class UserPreference(db.Model):
     updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     
     # Relationships
-    user = relationship("User", back_populates="preferences") 
+    user = relationship("User", back_populates="preferences")
+
+
+class EmailVerificationOTP(db.Model):
+    __tablename__ = 'email_verification_otps'
+
+    otp_id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(String(36), ForeignKey('users.user_id'), nullable=False)
+    email = Column(String(255), nullable=False)
+    otp_code = Column(String(6), nullable=False)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    expires_at = Column(DateTime(timezone=True), nullable=False)
+    is_used = Column(Boolean, default=False)
+    attempts = Column(Integer, default=0)
+
+    # Relationships
+    user = relationship("User")
+
+    def is_expired(self):
+        """Check if OTP has expired"""
+        now = datetime.now(timezone.utc)
+        # Ensure both datetimes are timezone-aware for comparison
+        if self.expires_at.tzinfo is None:
+            expires_at = self.expires_at.replace(tzinfo=timezone.utc)
+        else:
+            expires_at = self.expires_at
+        return now > expires_at
+
+    def is_valid(self):
+        """Check if OTP is valid (not used, not expired, attempts < 3)"""
+        return not self.is_used and not self.is_expired() and self.attempts < 3

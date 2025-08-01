@@ -206,7 +206,12 @@ class AuthService:
             
             db.session.add(session)
             db.session.commit()
-            
+
+            # Get onboarding status from user preferences
+            from app.models.user import UserPreference
+            preferences = UserPreference.query.filter_by(user_id=user.user_id).first()
+            onboarding_completed = preferences.onboarding_completed if preferences else False
+
             return {
                 "user": {
                     "user_id": user.user_id,
@@ -214,7 +219,8 @@ class AuthService:
                     "username": user.username,
                     "full_name": user.full_name,
                     "account_status": user.account_status,
-                    "email_verified": user.email_verified
+                    "email_verified": user.email_verified,
+                    "onboarding_completed": onboarding_completed
                 },
                 "session": {
                     "access_token": token,
@@ -366,6 +372,59 @@ class AuthService:
             abort(500, description="Internal server error")
 
     @classmethod
+    def complete_onboarding(cls, user_id: str) -> Dict[str, Any]:
+        """
+        Mark user's onboarding as completed in user preferences.
+
+        Args:
+            user_id: User ID
+
+        Returns:
+            Dict containing user data with onboarding status
+
+        Raises:
+            Flask abort: If completion fails
+        """
+        try:
+            from app.models.user import UserPreference
+
+            user = User.query.get(user_id)
+            if not user:
+                abort(404, description="User not found")
+
+            # Get or create user preferences
+            preferences = UserPreference.query.filter_by(user_id=user_id).first()
+            if not preferences:
+                preferences = UserPreference(
+                    user_id=user_id,
+                    onboarding_completed=True
+                )
+                db.session.add(preferences)
+            else:
+                preferences.onboarding_completed = True
+                preferences.updated_at = datetime.now(timezone.utc)
+
+            db.session.commit()
+
+            # Return user data with onboarding status
+            return {
+                "user_id": user.user_id,
+                "email": user.email,
+                "username": user.username,
+                "full_name": user.full_name,
+                "profile_image_url": user.profile_image_url,
+                "account_status": user.account_status,
+                "email_verified": user.email_verified,
+                "onboarding_completed": True,
+                "updated_at": user.updated_at.isoformat()
+            }
+
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Error completing onboarding: {str(e)}")
+            abort(500, description="Internal server error")
+
+    @classmethod
     def verify_email(cls, token: str) -> Dict[str, Any]:
         """
         Verify a user's email address using a verification token
@@ -440,6 +499,46 @@ class AuthService:
             abort(500, description="Internal server error")
 
     @classmethod
+    def verify_email_with_otp(cls, user_id: str, email: str, otp_code: str) -> Dict[str, Any]:
+        """
+        Verify a user's email address using an OTP code
+
+        Args:
+            user_id: User's ID
+            email: User's email address
+            otp_code: OTP verification code
+
+        Returns:
+            Dict containing verification result
+
+        Raises:
+            Flask abort: If verification fails
+        """
+        try:
+            from app.services.otp_service import OTPService
+            result = OTPService.verify_email_otp(user_id, email, otp_code)
+
+            # Return user data along with verification result
+            user = User.query.get(user_id)
+            if user:
+                result["user"] = {
+                    "user_id": user.user_id,
+                    "email": user.email,
+                    "full_name": user.full_name,
+                    "email_verified": True
+                }
+
+            return result
+
+        except Exception as e:
+            logger.error(f"Error verifying email with OTP: {str(e)}")
+            if hasattr(e, 'code') and hasattr(e, 'description'):
+                # Re-raise Flask abort exceptions
+                raise e
+            else:
+                abort(500, description="Email verification failed")
+
+    @classmethod
     def resend_verification_email(cls, email: str) -> Dict[str, Any]:
         """
         Resend verification email to a user
@@ -465,17 +564,23 @@ class AuthService:
             if user.email_verified:
                 abort(400, description="Email is already verified")
 
-            # Send verification email
+            # Generate and send new OTP
+            from app.services.otp_service import OTPService
+            otp_code = OTPService.resend_email_verification_otp(user.user_id, user.email)
+
+            # Send verification email with OTP
             success = EmailService.send_verification_email(user.user_id, user.email, user.full_name)
 
             if not success:
                 logger.warning(f"Failed to send verification email to {email}, but continuing...")
                 # Don't abort - user can still request resend later
 
-            logger.info(f"Verification email resent to {email}")
+            logger.info(f"Verification OTP resent to {email}")
 
             return {
-                "message": "Verification email sent successfully"
+                "message": "Verification code sent successfully",
+                "email": email,
+                "expires_in_minutes": OTPService.OTP_EXPIRY_MINUTES
             }
 
         except Exception as e:

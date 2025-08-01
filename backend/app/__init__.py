@@ -7,6 +7,7 @@ from app.apis.tracking.resource import tracking
 from app.apis.products.resource import products
 from app.apis.scraping.resource import scraping
 from app.apis.real_scraping.resource import real_scraping
+from app.apis.wishlist.resource import wishlist
 
 # Import models to register them with SQLAlchemy
 from app.models import *
@@ -51,6 +52,7 @@ def create_app():
     app.register_blueprint(products, url_prefix='/products')
     app.register_blueprint(scraping, url_prefix='/scraping')
     app.register_blueprint(real_scraping, url_prefix='/real-scraping')
+    app.register_blueprint(wishlist, url_prefix='/wishlist')
 
     with app.app_context():
         db.create_all()

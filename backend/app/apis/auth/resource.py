@@ -174,6 +174,27 @@ def verify_email():
         return jsonify({'error': str(e)}), 500
 
 
+@auth.route('/verify-email-otp', methods=['POST'])
+def verify_email_otp():
+    """
+    Verify a user's email address using an OTP code.
+    """
+    data = get_request_data(request)
+    user_id = data.get('user_id')
+    email = data.get('email')
+    otp_code = data.get('otp_code')
+
+    if not all([user_id, email, otp_code]):
+        return jsonify({'error': 'User ID, email, and OTP code are required'}), 400
+
+    try:
+        result = AuthService.verify_email_with_otp(user_id, email, otp_code)
+        return jsonify(result), 200
+    except Exception as e:
+        logger.error(f"Error verifying email with OTP: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
 @auth.route('/resend-verification', methods=['POST'])
 def resend_verification():
     """
@@ -223,42 +244,40 @@ def get_user_profile(user_id):
         return jsonify({'error': str(e)}), 500
 
 
-@auth.route('/profile/<user_id>', methods=['PUT'])
-def update_user_profile(user_id):
-    """
-    Update a user's profile information.
-    """
-    data = get_request_data(request)
-
-    try:
-        result = AuthService.update_user_profile(user_id, data)
-        return jsonify(result), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-
 @auth.route('/onboarding/<user_id>/complete', methods=['POST'])
 def complete_onboarding(user_id):
     """
     Mark a user's onboarding as completed.
     """
     try:
-        result = AuthService.update_user_profile(user_id, {"onboarding_completed": True})
+        result = AuthService.complete_onboarding(user_id)
         return jsonify({"message": "Onboarding completed successfully", "user": result}), 200
     except Exception as e:
-        # Even if there's an error, we'll consider onboarding complete
-        # This is a fallback for when the column doesn't exist yet
-        logger.warning(f"Error marking onboarding as completed: {str(e)}")
+        logger.error(f"Error completing onboarding: {str(e)}")
+        return jsonify({'error': f"Failed to complete onboarding: {str(e)}"}), 500
 
-        try:
-            # Get the user profile without updating it
-            result = AuthService.get_user_profile(user_id)
-            # Add the onboarding_completed flag manually
-            if isinstance(result, dict):
-                result["onboarding_completed"] = True
-            return jsonify({"message": "Onboarding process completed", "user": result}), 200
-        except Exception as inner_e:
-            return jsonify({'error': f"Failed to complete onboarding: {str(e)}, {str(inner_e)}"}), 500
+
+@auth.route('/profile/<user_id>', methods=['PUT'])
+def update_profile(user_id):
+    """
+    Update user profile information.
+    """
+    try:
+        data = get_request_data(request)
+
+        # Extract allowed fields
+        allowed_fields = ['username', 'full_name', 'profile_image_url']
+        update_data = {k: v for k, v in data.items() if k in allowed_fields and v is not None}
+
+        if not update_data:
+            return jsonify({'error': 'No valid fields to update'}), 400
+
+        result = AuthService.update_user_profile(user_id, **update_data)
+        return jsonify({"message": "Profile updated successfully", "user": result}), 200
+
+    except Exception as e:
+        logger.error(f"Error updating profile: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 
 @auth.route('/change-password', methods=['POST'])

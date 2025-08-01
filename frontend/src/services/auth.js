@@ -1,4 +1,4 @@
-import api from './api';
+import api from "./api";
 
 /**
  * Authentication service for handling user authentication
@@ -15,14 +15,16 @@ const AuthService = {
    */
   signup: async (userData) => {
     try {
-      const response = await api.post('/auth/signup', userData);
+      const response = await api.post("/auth/signup", userData);
       if (response.data.session) {
-        localStorage.setItem('auth_token', response.data.session.access_token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem("auth_token", response.data.session.access_token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
       }
       return response.data;
     } catch (error) {
-      throw error.response?.data?.error || error.message || 'Registration failed';
+      throw (
+        error.response?.data?.error || error.message || "Registration failed"
+      );
     }
   },
 
@@ -36,14 +38,14 @@ const AuthService = {
    */
   login: async (credentials) => {
     try {
-      const response = await api.post('/auth/login', credentials);
+      const response = await api.post("/auth/login", credentials);
       if (response.data.session) {
-        localStorage.setItem('auth_token', response.data.session.access_token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem("auth_token", response.data.session.access_token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
       }
       return response.data;
     } catch (error) {
-      throw error.response?.data?.error || error.message || 'Login failed';
+      throw error.response?.data?.error || error.message || "Login failed";
     }
   },
 
@@ -55,14 +57,18 @@ const AuthService = {
    */
   loginWithGoogle: async (accessToken) => {
     try {
-      const response = await api.post('/auth/google', { access_token: accessToken });
+      const response = await api.post("/auth/google", {
+        access_token: accessToken,
+      });
       if (response.data.session) {
-        localStorage.setItem('auth_token', response.data.session.access_token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem("auth_token", response.data.session.access_token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
       }
       return response.data;
     } catch (error) {
-      throw error.response?.data?.error || error.message || 'Google login failed';
+      throw (
+        error.response?.data?.error || error.message || "Google login failed"
+      );
     }
   },
 
@@ -73,18 +79,18 @@ const AuthService = {
    */
   logout: async () => {
     try {
-      const token = localStorage.getItem('auth_token');
+      const token = localStorage.getItem("auth_token");
       if (token) {
-        await api.post('/auth/logout', { access_token: token });
+        await api.post("/auth/logout", { access_token: token });
       }
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user');
+      localStorage.removeItem("auth_token");
+      localStorage.removeItem("user");
       return { success: true };
     } catch (error) {
       // Still remove local storage items even if the API call fails
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user');
-      throw error.response?.data?.error || error.message || 'Logout failed';
+      localStorage.removeItem("auth_token");
+      localStorage.removeItem("user");
+      throw error.response?.data?.error || error.message || "Logout failed";
     }
   },
 
@@ -96,10 +102,14 @@ const AuthService = {
    */
   forgotPassword: async (email) => {
     try {
-      const response = await api.post('/auth/forgot-password', { email });
+      const response = await api.post("/auth/forgot-password", { email });
       return response.data;
     } catch (error) {
-      throw error.response?.data?.error || error.message || 'Password reset request failed';
+      throw (
+        error.response?.data?.error ||
+        error.message ||
+        "Password reset request failed"
+      );
     }
   },
 
@@ -113,14 +123,16 @@ const AuthService = {
    */
   changePassword: async (userId, currentPassword, newPassword) => {
     try {
-      const response = await api.post('/auth/change-password', {
+      const response = await api.post("/auth/change-password", {
         user_id: userId,
         current_password: currentPassword,
-        new_password: newPassword
+        new_password: newPassword,
       });
       return response.data;
     } catch (error) {
-      throw error.response?.data?.error || error.message || 'Password change failed';
+      throw (
+        error.response?.data?.error || error.message || "Password change failed"
+      );
     }
   },
 
@@ -135,19 +147,23 @@ const AuthService = {
    */
   updateNotificationSettings: async (userId, settings) => {
     try {
-      const response = await api.post('/auth/update-notification-settings', {
+      const response = await api.post("/auth/update-notification-settings", {
         user_id: userId,
-        notification_settings: settings
+        notification_settings: settings,
       });
 
       // Update the user in localStorage with the updated settings
       if (response.data.user) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem("user", JSON.stringify(response.data.user));
       }
 
       return response.data;
     } catch (error) {
-      throw error.response?.data?.error || error.message || 'Failed to update notification settings';
+      throw (
+        error.response?.data?.error ||
+        error.message ||
+        "Failed to update notification settings"
+      );
     }
   },
 
@@ -157,7 +173,7 @@ const AuthService = {
    * @returns {Object|null} User object or null if not authenticated
    */
   getCurrentUser: () => {
-    const userStr = localStorage.getItem('user');
+    const userStr = localStorage.getItem("user");
     if (userStr) {
       try {
         return JSON.parse(userStr);
@@ -174,7 +190,7 @@ const AuthService = {
    * @returns {boolean} True if authenticated, false otherwise
    */
   isAuthenticated: () => {
-    return !!localStorage.getItem('auth_token');
+    return !!localStorage.getItem("auth_token");
   },
 
   /**
@@ -183,7 +199,7 @@ const AuthService = {
    * @returns {boolean} True if onboarding is completed, false otherwise
    */
   hasCompletedOnboarding: () => {
-    const userStr = localStorage.getItem('user');
+    const userStr = localStorage.getItem("user");
     if (userStr) {
       try {
         const user = JSON.parse(userStr);
@@ -203,20 +219,22 @@ const AuthService = {
   completeOnboarding: async () => {
     try {
       const user = AuthService.getCurrentUser();
-      if (!user || !user.id) {
-        throw new Error('User not authenticated');
+      if (!user || !user.user_id) {
+        throw new Error("User not authenticated");
       }
 
-      const response = await api.post(`/auth/onboarding/${user.id}/complete`);
+      const response = await api.post(
+        `/auth/onboarding/${user.user_id}/complete`
+      );
 
       // Update the user in localStorage with the updated onboarding status
       if (response.data.user) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem("user", JSON.stringify(response.data.user));
       }
 
       return response.data;
     } catch (error) {
-      console.error('Error completing onboarding:', error);
+      console.error("Error completing onboarding:", error);
 
       // Even if the API call fails, we'll mark onboarding as completed locally
       // This is a fallback for when the backend can't update the database
@@ -224,17 +242,114 @@ const AuthService = {
         const user = AuthService.getCurrentUser();
         if (user) {
           user.onboarding_completed = true;
-          localStorage.setItem('user', JSON.stringify(user));
+          localStorage.setItem("user", JSON.stringify(user));
         }
 
         return {
           message: "Onboarding completed (local only)",
-          user: user
+          user: user,
         };
       } catch (localError) {
-        console.error('Error updating local user data:', localError);
-        throw error.response?.data?.error || error.message || 'Failed to complete onboarding';
+        console.error("Error updating local user data:", localError);
+        throw (
+          error.response?.data?.error ||
+          error.message ||
+          "Failed to complete onboarding"
+        );
       }
+    }
+  },
+
+  /**
+   * Update user profile information
+   *
+   * @param {Object} profileData - Profile data to update
+   * @param {string} profileData.username - New username
+   * @param {string} profileData.full_name - New full name
+   * @param {string} profileData.profile_image_url - New profile image URL
+   * @returns {Promise} Promise with update result
+   */
+  updateProfile: async (profileData) => {
+    try {
+      const user = AuthService.getCurrentUser();
+      if (!user || !user.user_id) {
+        throw new Error("User not authenticated");
+      }
+
+      const response = await api.put(
+        `/auth/profile/${user.user_id}`,
+        profileData
+      );
+
+      // Update the user in localStorage with the updated profile
+      if (response.data.user) {
+        const currentUser = AuthService.getCurrentUser();
+        const updatedUser = { ...currentUser, ...response.data.user };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      }
+
+      return response.data;
+    } catch (error) {
+      throw (
+        error.response?.data?.error || error.message || "Profile update failed"
+      );
+    }
+  },
+
+  /**
+   * Verify email using OTP code
+   *
+   * @param {string} userId - User ID
+   * @param {string} email - User's email address
+   * @param {string} otpCode - OTP verification code
+   * @returns {Promise} Promise with verification result
+   */
+  verifyEmailOTP: async (userId, email, otpCode) => {
+    try {
+      const response = await api.post("/auth/verify-email-otp", {
+        user_id: userId,
+        email: email,
+        otp_code: otpCode,
+      });
+
+      // Update the user in localStorage if verification successful
+      if (response.data.user) {
+        const currentUser = AuthService.getCurrentUser();
+        if (currentUser && currentUser.user_id === userId) {
+          const updatedUser = { ...currentUser, ...response.data.user };
+          localStorage.setItem("user", JSON.stringify(updatedUser));
+        }
+      }
+
+      return response.data;
+    } catch (error) {
+      throw (
+        error.response?.data?.error ||
+        error.message ||
+        "Email verification failed"
+      );
+    }
+  },
+
+  /**
+   * Resend verification OTP
+   *
+   * @param {string} email - User's email address
+   * @returns {Promise} Promise with resend result
+   */
+  resendVerificationOTP: async (email) => {
+    try {
+      const response = await api.post("/auth/resend-verification", {
+        email: email,
+      });
+
+      return response.data;
+    } catch (error) {
+      throw (
+        error.response?.data?.error ||
+        error.message ||
+        "Failed to resend verification code"
+      );
     }
   },
 
@@ -245,28 +360,33 @@ const AuthService = {
    * @returns {Object} Verification result
    */
   handleVerification: (params) => {
-    const accessToken = params.get('access_token');
-    const type = params.get('type');
-    const expiresIn = params.get('expires_in');
-    const refreshToken = params.get('refresh_token');
-    const tokenType = params.get('token_type');
+    const accessToken = params.get("access_token");
+    const type = params.get("type");
+    const expiresIn = params.get("expires_in");
+    const refreshToken = params.get("refresh_token");
+    const tokenType = params.get("token_type");
 
-    if (accessToken && type === 'signup') {
+    if (accessToken && type === "signup") {
       // Store auth data
-      localStorage.setItem('auth_token', accessToken);
+      localStorage.setItem("auth_token", accessToken);
 
       if (refreshToken) {
-        localStorage.setItem('refresh_token', refreshToken);
+        localStorage.setItem("refresh_token", refreshToken);
       }
 
       // Extract user information from JWT token
       try {
         // Parse the JWT token to get user info
-        const base64Url = accessToken.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
+        const base64Url = accessToken.split(".")[1];
+        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+        const jsonPayload = decodeURIComponent(
+          atob(base64)
+            .split("")
+            .map(function (c) {
+              return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+            })
+            .join("")
+        );
 
         const payload = JSON.parse(jsonPayload);
 
@@ -274,27 +394,27 @@ const AuthService = {
         const user = {
           id: payload.sub,
           email: payload.email,
-          full_name: payload.user_metadata?.full_name || '',
-          email_verified: payload.user_metadata?.email_verified || true
+          full_name: payload.user_metadata?.full_name || "",
+          email_verified: payload.user_metadata?.email_verified || true,
         };
 
         // Store user data
-        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem("user", JSON.stringify(user));
       } catch (error) {
-        console.error('Error parsing JWT token:', error);
+        console.error("Error parsing JWT token:", error);
       }
 
       return {
         success: true,
-        message: 'Email verified successfully'
+        message: "Email verified successfully",
       };
     }
 
     return {
       success: false,
-      message: 'Invalid verification link'
+      message: "Invalid verification link",
     };
-  }
+  },
 };
 
 export default AuthService;

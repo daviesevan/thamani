@@ -40,7 +40,7 @@ class Product(db.Model):
     product_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=False)
     description = Column(Text)
-    category_id = Column(Integer, ForeignKey('categories.category_id'), nullable=False)
+    category_id = Column(Integer, ForeignKey('categories.category_id'), nullable=True)
     brand = Column(String(100))
     model = Column(String(100))
     image_url = Column(String(255))

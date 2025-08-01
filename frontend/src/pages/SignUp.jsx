@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react';
 import FormInput from '../components/auth/FormInput';
@@ -7,6 +8,7 @@ import AuthService from '../services/auth';
 import { loadGoogleScript, renderCustomGoogleButton } from '../utils/googleAuth';
 
 const SignUp = () => {
+  const navigate = useNavigate();
   const toast = useToast();
   const googleButtonRef = useRef(null);
   const [formData, setFormData] = useState({
@@ -131,15 +133,26 @@ const SignUp = () => {
 
     try {
       // Call the authentication service to register
-      await AuthService.signup({
+      const result = await AuthService.signup({
         email: formData.email,
         password: formData.password,
         fullName: formData.fullName
       });
 
-      // Show success message and set signup success state
-      setSignupSuccess(true);
-      toast.success('Account created successfully!');
+      // Show success message
+      toast.success('Account created successfully! Please check your email for verification code.');
+
+      // Redirect to OTP verification with user data
+      navigate('/verify-email', {
+        state: {
+          user: result.user || {
+            user_id: result.user_id,
+            email: formData.email,
+            full_name: formData.fullName,
+            email_verified: false
+          }
+        }
+      });
     } catch (error) {
       console.error('Registration error:', error);
       toast.error(error.toString() || 'Failed to create account. Please try again.');

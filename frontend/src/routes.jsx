@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import ForgotPassword from './pages/ForgotPassword';
+import OTPVerification from './components/auth/OTPVerification';
 import Onboarding from './pages/Onboarding';
 import LoaderDemo from './pages/LoaderDemo';
 import VerificationSuccess from './pages/VerificationSuccess';
@@ -12,6 +13,7 @@ import Settings from './pages/Settings';
 import ProductSearch from './pages/ProductSearch';
 import ProductDetail from './pages/ProductDetail';
 import TrackedProducts from './pages/TrackedProducts';
+import Wishlist from './pages/Wishlist';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 
 /**
@@ -36,6 +38,11 @@ const routes = [
   {
     path: '/forgot-password',
     element: <ForgotPassword />,
+    exact: true,
+  },
+  {
+    path: '/verify-email',
+    element: <OTPVerification />,
     exact: true,
   },
   {
@@ -93,7 +100,7 @@ const routes = [
       },
       {
         path: 'wishlist',
-        element: <div className="p-4">Wishlist Page (Coming Soon)</div>,
+        element: <Wishlist />,
         exact: true,
       },
       {
