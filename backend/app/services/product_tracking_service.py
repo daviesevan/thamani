@@ -20,9 +20,115 @@ class ProductTrackingService:
     """
     Service for managing product tracking and price monitoring
     """
-    
+
     @classmethod
-    def add_tracked_product(cls, user_id: str, product_id: int, target_price: Optional[float] = None, 
+    def _ensure_product_in_database(cls, product_id) -> int:
+        """
+        Ensure a product exists in the database, creating it if it's a scraped product
+
+        Args:
+            product_id: Product ID (int for database products, str for scraped products)
+
+        Returns:
+            Integer product ID for database operations
+        """
+        try:
+            # If it's already an integer, check if it exists in database
+            if isinstance(product_id, int) or (isinstance(product_id, str) and product_id.isdigit()):
+                int_product_id = int(product_id)
+                product = Product.query.get(int_product_id)
+                if product:
+                    return int_product_id
+                else:
+                    abort(404, description="Product not found")
+
+            # If it's a string ID, it's a scraped product - get it from cache
+            from app.services.product_service import ProductService
+            cached_product = ProductService._get_cached_scraped_product(str(product_id))
+
+            if not cached_product:
+                abort(404, description="Scraped product not found in cache. Please search for the product again.")
+
+            # Create a database entry for the scraped product
+            return cls._create_database_product_from_scraped(cached_product)
+
+        except Exception as e:
+            logger.error(f"Error ensuring product in database: {str(e)}")
+            raise
+
+    @classmethod
+    def _create_database_product_from_scraped(cls, scraped_product: Dict[str, Any]) -> int:
+        """
+        Create a database product entry from scraped product data
+
+        Args:
+            scraped_product: Scraped product data
+
+        Returns:
+            Integer product ID for the created database product
+        """
+        try:
+            # Check if a similar product already exists
+            existing_product = Product.query.filter_by(
+                name=scraped_product.get('name', ''),
+                brand=scraped_product.get('brand', '')
+            ).first()
+
+            if existing_product:
+                return existing_product.product_id
+
+            # Create new product
+            product = Product(
+                name=scraped_product.get('name', ''),
+                brand=scraped_product.get('brand', ''),
+                model=scraped_product.get('model', ''),
+                description=scraped_product.get('description', ''),
+                image_url=scraped_product.get('image_url', ''),
+                category_id=None,  # We'll handle category mapping later
+                created_at=datetime.now(timezone.utc)
+            )
+
+            db.session.add(product)
+            db.session.flush()  # Get the product_id without committing
+
+            # Create retailer entries for the scraped product
+            for retailer_data in scraped_product.get('retailers', []):
+                # Find or create retailer
+                retailer = Retailer.query.filter_by(name=retailer_data.get('retailer_name', retailer_data.get('name', ''))).first()
+                if not retailer:
+                    retailer = Retailer(
+                        name=retailer_data.get('retailer_name', retailer_data.get('name', '')),
+                        website_url=retailer_data.get('retailer_product_url', ''),
+                        is_active=True,
+                        created_at=datetime.now(timezone.utc)
+                    )
+                    db.session.add(retailer)
+                    db.session.flush()
+
+                # Create product-retailer relationship
+                product_retailer = ProductRetailer(
+                    product_id=product.product_id,
+                    retailer_id=retailer.retailer_id,
+                    retailer_product_url=retailer_data.get('retailer_product_url', ''),
+                    current_price=retailer_data.get('current_price', 0),
+                    original_price=retailer_data.get('original_price'),
+                    currency_code=retailer_data.get('currency_code', 'KES'),
+                    in_stock=retailer_data.get('in_stock', True),
+                    last_updated=datetime.now(timezone.utc)
+                )
+                db.session.add(product_retailer)
+
+            db.session.commit()
+            logger.info(f"Created database product {product.product_id} from scraped data")
+            return product.product_id
+
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Error creating database product from scraped data: {str(e)}")
+            raise
+
+    @classmethod
+    def add_tracked_product(cls, user_id: str, product_id, target_price: Optional[float] = None,
                           notes: Optional[str] = None, alert_threshold_percent: float = 10.0) -> Dict[str, Any]:
         """
         Add a product to user's tracking list
@@ -42,15 +148,13 @@ class ProductTrackingService:
             user = User.query.get(user_id)
             if not user:
                 abort(404, description="User not found")
-            
-            # Verify product exists
-            product = Product.query.get(product_id)
-            if not product:
-                abort(404, description="Product not found")
-            
+
+            # Ensure product exists in database (handles both DB and scraped products)
+            db_product_id = cls._ensure_product_in_database(product_id)
+
             # Check if already tracking
             existing_tracking = UserTrackedProduct.query.filter_by(
-                user_id=user_id, product_id=product_id
+                user_id=user_id, product_id=db_product_id
             ).first()
             
             if existing_tracking:
@@ -66,25 +170,25 @@ class ProductTrackingService:
                     existing_tracking.alert_threshold_percent = Decimal(str(alert_threshold_percent))
                     
                     db.session.commit()
-                    logger.info(f"Reactivated tracking for user {user_id}, product {product_id}")
+                    logger.info(f"Reactivated tracking for user {user_id}, product {db_product_id}")
                 else:
                     abort(400, description="Product is already being tracked")
             else:
                 # Create new tracking
                 tracked_product = UserTrackedProduct(
                     user_id=user_id,
-                    product_id=product_id,
+                    product_id=db_product_id,
                     target_price=Decimal(str(target_price)) if target_price else None,
                     notes=notes,
                     alert_threshold_percent=Decimal(str(alert_threshold_percent))
                 )
-                
+
                 db.session.add(tracked_product)
                 db.session.commit()
-                logger.info(f"Added tracking for user {user_id}, product {product_id}")
-            
+                logger.info(f"Added tracking for user {user_id}, product {db_product_id}")
+
             # Get the tracking with product details
-            return cls.get_tracked_product_details(user_id, product_id)
+            return cls.get_tracked_product_details(user_id, db_product_id)
             
         except Exception as e:
             db.session.rollback()
@@ -92,7 +196,7 @@ class ProductTrackingService:
             abort(500, description="Internal server error")
     
     @classmethod
-    def remove_tracked_product(cls, user_id: str, product_id: int) -> Dict[str, Any]:
+    def remove_tracked_product(cls, user_id: str, product_id) -> Dict[str, Any]:
         """
         Remove a product from user's tracking list
         
@@ -104,8 +208,11 @@ class ProductTrackingService:
             Dict containing removal confirmation
         """
         try:
+            # Convert to database product ID if needed
+            db_product_id = cls._ensure_product_in_database(product_id)
+
             tracked_product = UserTrackedProduct.query.filter_by(
-                user_id=user_id, product_id=product_id
+                user_id=user_id, product_id=db_product_id
             ).first()
             
             if not tracked_product:
@@ -165,20 +272,23 @@ class ProductTrackingService:
             abort(500, description="Internal server error")
     
     @classmethod
-    def get_tracked_product_details(cls, user_id: str, product_id: int) -> Dict[str, Any]:
+    def get_tracked_product_details(cls, user_id: str, product_id) -> Dict[str, Any]:
         """
         Get detailed information about a tracked product
-        
+
         Args:
             user_id: User's ID
-            product_id: Product ID
-            
+            product_id: Product ID (int for database products, str for scraped products)
+
         Returns:
             Dict containing detailed product and tracking information
         """
         try:
+            # Convert to database product ID if needed
+            db_product_id = cls._ensure_product_in_database(product_id)
+
             tracked_product = UserTrackedProduct.query.filter_by(
-                user_id=user_id, product_id=product_id, is_archived=False
+                user_id=user_id, product_id=db_product_id, is_archived=False
             ).first()
             
             if not tracked_product:

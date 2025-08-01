@@ -32,12 +32,13 @@ const ProductDetail = () => {
 
   const loadProductDetails = async () => {
     try {
-      const productData = await productService.getProductDetails(parseInt(productId));
+      // Handle both integer and string product IDs
+      const productData = await productService.getProductDetails(productId);
       setProduct(productData);
     } catch (error) {
       console.error('Error loading product details:', error);
       showToast('Error loading product details', 'error');
-      navigate('/products/search');
+      navigate('/dashboard/search');
     } finally {
       setLoading(false);
     }
@@ -45,7 +46,14 @@ const ProductDetail = () => {
 
   const checkTrackingStatus = async () => {
     try {
-      const trackedData = await trackingService.getTrackedProductDetails(user.user_id, parseInt(productId));
+      // Skip tracking check for scraped products
+      if (product?.source === 'web_scraping') {
+        setIsTracked(false);
+        setTrackingData(null);
+        return;
+      }
+
+      const trackedData = await trackingService.getTrackedProductDetails(user.user_id, productId);
       setIsTracked(true);
       setTrackingData(trackedData);
     } catch (error) {
@@ -61,9 +69,16 @@ const ProductDetail = () => {
       return;
     }
 
+    // Check if this is a scraped product
+    if (product?.source === 'web_scraping') {
+      showToast('Price tracking for live scraped products is coming soon! For now, bookmark this product or check back regularly for price updates.', 'info');
+      setShowTrackingModal(false);
+      return;
+    }
+
     setTrackingLoading(true);
     try {
-      await trackingService.addTrackedProduct(user.user_id, parseInt(productId), trackingInfo);
+      await trackingService.addTrackedProduct(user.user_id, productId, trackingInfo);
       setIsTracked(true);
       showToast('Product added to tracking', 'success');
       setShowTrackingModal(false);
@@ -77,9 +92,15 @@ const ProductDetail = () => {
   };
 
   const handleUpdateTracking = async (updateData) => {
+    // Scraped products shouldn't be tracked anyway, but just in case
+    if (product?.source === 'web_scraping') {
+      setShowTrackingModal(false);
+      return;
+    }
+
     setTrackingLoading(true);
     try {
-      await trackingService.updateTrackedProduct(user.user_id, parseInt(productId), updateData);
+      await trackingService.updateTrackedProduct(user.user_id, productId, updateData);
       showToast('Tracking updated successfully', 'success');
       setShowTrackingModal(false);
       checkTrackingStatus();
@@ -92,9 +113,14 @@ const ProductDetail = () => {
   };
 
   const handleRemoveTracking = async () => {
+    // Scraped products shouldn't be tracked anyway, but just in case
+    if (product?.source === 'web_scraping') {
+      return;
+    }
+
     setTrackingLoading(true);
     try {
-      await trackingService.removeTrackedProduct(user.user_id, parseInt(productId));
+      await trackingService.removeTrackedProduct(user.user_id, productId);
       setIsTracked(false);
       setTrackingData(null);
       showToast('Product removed from tracking', 'success');
@@ -268,10 +294,12 @@ const ProductDetail = () => {
                 {!isTracked ? (
                   <Button
                     onClick={() => setShowTrackingModal(true)}
-                    disabled={trackingLoading}
+                    disabled={trackingLoading || product?.source === 'web_scraping'}
                     className="flex-1"
+                    title={product?.source === 'web_scraping' ? 'Price tracking for live scraped products coming soon' : ''}
                   >
-                    {trackingLoading ? 'Adding...' : 'Track This Product'}
+                    {trackingLoading ? 'Adding...' :
+                     product?.source === 'web_scraping' ? 'Tracking Coming Soon' : 'Track This Product'}
                   </Button>
                 ) : (
                   <Button

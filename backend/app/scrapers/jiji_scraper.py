@@ -51,21 +51,21 @@ class JijiScraper:
         products = []
         
         try:
-            # Jiji search URL format
+            # Jiji uses a search endpoint with query parameters
             search_url = f"{self.base_url}/search"
-            
+
             for page in range(1, max_pages + 1):
                 logger.info(f"Scraping Jiji page {page} for query: {query}")
-                
+
                 # Add delay to avoid being blocked
                 time.sleep(random.uniform(3, 6))
-                
-                # Search parameters
+
+                # Build search parameters
                 params = {
                     'query': query,
                     'page': page
                 }
-                
+
                 response = self.session.get(search_url, params=params, timeout=15)
                 response.raise_for_status()
                 
@@ -92,16 +92,14 @@ class JijiScraper:
         """
         products = []
         
-        # Jiji product selectors - they use various class names
+        # Jiji product selectors - updated based on actual HTML structure
         product_selectors = [
-            '[data-testid="advert-list-item"]',  # Main ad items
-            '.b-advert-card',  # Ad cards
-            '.advert-card',  # Alternative ad cards
-            '.listing-item',  # Listing items
-            '.ad-item',  # Ad items
-            'article[data-id]'  # Articles with data-id
+            '.b-list-advert__gallery__item',       # Main product containers
+            '.js-advert-list-item',                # Items with JS class
+            '.b-list-advert-base',                 # Base advert elements
+            '.qa-advert-list-item'                 # QA attribute items
         ]
-        
+
         product_elements = []
         for selector in product_selectors:
             elements = soup.select(selector)
@@ -141,44 +139,56 @@ class JijiScraper:
         Extract data from a single Jiji ad element
         """
         try:
-            # Product name/title
-            title_selectors = [
-                '[data-testid="advert-title"]',
-                '.advert-title',
-                '.ad-title',
-                'h3 a',
-                '.title a',
-                'a[title]'
-            ]
-            
+            # Updated selectors for current Jiji structure
             name = None
             product_link = None
-            
-            for selector in title_selectors:
-                title_element = element.select_one(selector)
-                if title_element:
-                    name = title_element.get_text(strip=True) or title_element.get('title', '').strip()
-                    if name:
-                        # Get product link
-                        if title_element.name == 'a':
-                            product_link = urljoin(self.base_url, title_element.get('href'))
-                        else:
-                            link_element = title_element.find_parent('a') or element.select_one('a')
-                            if link_element and link_element.get('href'):
-                                product_link = urljoin(self.base_url, link_element.get('href'))
-                        break
+
+            # Try to get the main ad link - Jiji structure has the link as the main element
+            if element.name == 'a' and 'qa-advert-list-item' in element.get('class', []):
+                # The element itself is the link
+                product_link = urljoin(self.base_url, element.get('href', ''))
+                name = element.get('title', '').strip()
+            else:
+                # Look for link within the element
+                link_selectors = [
+                    'a.qa-advert-list-item',                   # Main product links
+                    'a.b-list-advert-base',                    # Base advert links
+                    'a[href*=".html"]'                         # Any Jiji product link
+                ]
+
+                for selector in link_selectors:
+                    link_element = element.select_one(selector)
+                    if link_element:
+                        product_link = urljoin(self.base_url, link_element.get('href', ''))
+                        name = link_element.get('title', '').strip()
+                        if product_link:
+                            break
+
+            # If we didn't get the name from the link, try the title selectors
+            if not name:
+                title_selectors = [
+                    '.qa-advert-title',                    # Main title with QA attribute
+                    '.b-advert-title-inner',               # Inner title element
+                    '.qa-advert-list-item-title',          # List item title
+                    '.b-list-advert-base__item-title'      # Base item title
+                ]
+
+                for selector in title_selectors:
+                    title_element = element.select_one(selector)
+                    if title_element:
+                        name = title_element.get_text(strip=True)
+                        if name:
+                            break
             
             if not name:
                 return None
             
-            # Price extraction
+            # Price extraction - updated selectors based on actual HTML structure
             price_selectors = [
-                '[data-testid="advert-price"]',
-                '.advert-price',
-                '.price',
-                '.ad-price',
-                '.listing-price',
-                '.amount'
+                '.qa-advert-price',                    # Main price with QA attribute
+                '.b-list-advert__price-base',          # Price base container
+                '.b-list-advert-base__data__price',    # Price data container
+                '.b-list-advert__price'                # General price class
             ]
             
             price = None
@@ -186,6 +196,7 @@ class JijiScraper:
                 price_element = element.select_one(selector)
                 if price_element:
                     price_text = price_element.get_text(strip=True)
+                    # Handle Jiji's "KSh" prefix and number formatting
                     price = self._extract_price_from_text(price_text)
                     if price:
                         break
@@ -205,24 +216,21 @@ class JijiScraper:
                     location = loc_element.get_text(strip=True)
                     break
             
-            # Product image
+            # Product image - Jiji uses picture elements with img inside
             image_url = None
             img_selectors = [
-                'img[data-testid="advert-image"]',
-                '.advert-image img',
-                'img',
-                '.image img'
+                'picture img',                         # Images inside picture elements
+                '.b-list-advert-base__img img',        # Images in base img containers
+                'img[alt*="Photo"]',                   # Images with Photo in alt text
+                'img'                                  # Any img element
             ]
-            
+
             for selector in img_selectors:
                 img_element = element.select_one(selector)
                 if img_element:
                     img_src = img_element.get('src') or img_element.get('data-src') or img_element.get('data-lazy')
-                    if img_src:
-                        if img_src.startswith('http'):
-                            image_url = img_src
-                        else:
-                            image_url = urljoin(self.base_url, img_src)
+                    if img_src and img_src.startswith('http'):
+                        image_url = img_src
                         break
             
             # Posted date/time
@@ -331,29 +339,39 @@ class JijiScraper:
             logger.error(f"Error extracting from Jiji link: {str(e)}")
             return None
     
-    def _extract_price_from_text(self, price_text: str) -> Optional[float]:
-        """
-        Extract numeric price from text like "KSh 45,000" or "45,000"
-        """
-        if not price_text:
+    def _extract_price_from_text(self, text: str) -> Optional[float]:
+        """Extract price value from text"""
+        if not text:
             return None
-        
-        # Handle "Negotiable" or "Call for price" cases
-        if any(word in price_text.lower() for word in ['negotiable', 'call', 'contact', 'ask']):
+            
+        try:
+            # Remove any non-price text
+            text = text.lower().strip()
+            # Handle "call" or "contact" prices
+            if 'call' in text or 'contact' in text:
+                return None
+                
+            # Remove currency symbols and formatting
+            price_text = (text.replace('ksh', '').replace('kshs', '').replace('sh', '')
+                            .replace('ksh.', '').replace('kes', '').replace('₹', '')
+                            .replace(',', '').replace('/-', '').strip())
+            
+            # Handle ranges by taking the lower price
+            if '-' in price_text:
+                price_text = price_text.split('-')[0].strip()
+                
+            # Handle "k" and "m" abbreviations
+            if 'k' in price_text.lower():
+                price_text = price_text.lower().replace('k', '').strip()
+                return float(price_text) * 1000
+            elif 'm' in price_text.lower():
+                price_text = price_text.lower().replace('m', '').strip()
+                return float(price_text) * 1000000
+                
+            # Convert to float
+            return float(price_text)
+        except (ValueError, TypeError):
             return None
-        
-        # Remove currency symbols and clean
-        cleaned = re.sub(r'[KSh\s,]', '', price_text)
-        
-        # Find numeric value
-        price_match = re.search(r'(\d+\.?\d*)', cleaned)
-        if price_match:
-            try:
-                return float(price_match.group(1))
-            except ValueError:
-                pass
-        
-        return None
     
     def get_product_details(self, product_url: str) -> Optional[Dict[str, Any]]:
         """

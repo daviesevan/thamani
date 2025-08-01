@@ -7,16 +7,63 @@ from flask import abort
 from sqlalchemy import or_, and_, desc
 from app.extensions.extensions import db
 from app.models.product import Product, ProductRetailer, Category, Retailer
+import time
+from datetime import datetime, timedelta
 
 # Set up logger
 logger = logging.getLogger(__name__)
+
+# Simple in-memory cache for scraped products (expires after 1 hour)
+_scraped_products_cache = {}
+_cache_expiry_time = 3600  # 1 hour in seconds
 
 
 class ProductService:
     """
     Service for product search and discovery
     """
-    
+
+    @classmethod
+    def _cache_scraped_products(cls, products: List[Dict[str, Any]]) -> None:
+        """
+        Cache scraped products temporarily
+
+        Args:
+            products: List of scraped products to cache
+        """
+        current_time = time.time()
+        for product in products:
+            product_id = product.get('product_id')
+            if product_id:
+                _scraped_products_cache[product_id] = {
+                    'product': product,
+                    'cached_at': current_time
+                }
+
+    @classmethod
+    def _get_cached_scraped_product(cls, product_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Get a cached scraped product
+
+        Args:
+            product_id: Product ID to retrieve
+
+        Returns:
+            Cached product data or None if not found/expired
+        """
+        if product_id not in _scraped_products_cache:
+            return None
+
+        cached_item = _scraped_products_cache[product_id]
+        current_time = time.time()
+
+        # Check if cache has expired
+        if current_time - cached_item['cached_at'] > _cache_expiry_time:
+            del _scraped_products_cache[product_id]
+            return None
+
+        return cached_item['product']
+
     @classmethod
     def search_products(cls, query: str = "", category_id: Optional[int] = None,
                        brand: Optional[str] = None, min_price: Optional[float] = None,
@@ -104,7 +151,10 @@ class ProductService:
             total_count = len(all_products)
             paginated_products = all_products[offset:offset + limit]
 
-            logger.info(f"Web scraping search completed: {total_count} products found")
+            # Cache the scraped products for later retrieval
+            cls._cache_scraped_products(all_products)
+
+            logger.info(f"Web scraping search completed: {total_count} products found, {len(all_products)} cached")
 
             return {
                 "products": paginated_products,
@@ -191,10 +241,10 @@ class ProductService:
     def get_product_details(cls, product_id: int) -> Dict[str, Any]:
         """
         Get detailed information about a specific product
-        
+
         Args:
             product_id: Product ID
-            
+
         Returns:
             Dict containing detailed product information
         """
@@ -202,11 +252,39 @@ class ProductService:
             product = Product.query.get(product_id)
             if not product:
                 abort(404, description="Product not found")
-            
+
             return cls._format_product_details(product)
-            
+
         except Exception as e:
             logger.error(f"Error getting product details: {str(e)}")
+            abort(500, description="Internal server error")
+
+    @classmethod
+    def get_scraped_product_details(cls, product_id: str) -> Dict[str, Any]:
+        """
+        Get detailed information about a scraped product
+
+        Args:
+            product_id: String-based product ID from web scraping
+
+        Returns:
+            Dict containing detailed product information
+        """
+        try:
+            # Try to get the product from cache first
+            cached_product = cls._get_cached_scraped_product(product_id)
+
+            if cached_product:
+                logger.info(f"Retrieved scraped product {product_id} from cache")
+                return cached_product
+
+            # If not in cache, the product might be from an older search
+            # In this case, we'll return a helpful error message
+            logger.warning(f"Scraped product {product_id} not found in cache")
+            abort(404, description="Product not found. This may be because the search results have expired. Please search for the product again.")
+
+        except Exception as e:
+            logger.error(f"Error getting scraped product details: {str(e)}")
             abort(500, description="Internal server error")
 
     @classmethod
@@ -248,6 +326,7 @@ class ProductService:
                 "retailers": [{
                     "retailer_id": retailer.lower().replace(' ', '_'),
                     "name": retailer,
+                    "retailer_name": retailer.title(),  # Add retailer_name field for frontend compatibility
                     "current_price": price,
                     "original_price": original_price,
                     "currency_code": scraped_product.get('currency', 'KES'),

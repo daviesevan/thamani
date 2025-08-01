@@ -85,17 +85,26 @@ def search_products_web_scraping():
         return jsonify({'error': str(e)}), 500
 
 
-@products.route('/<int:product_id>', methods=['GET'])
+@products.route('/<product_id>', methods=['GET'])
 def get_product_details(product_id):
     """
     Get detailed information about a specific product
+    Supports both integer IDs (database products) and string IDs (scraped products)
     """
     try:
-        product_details = ProductService.get_product_details(product_id)
-        return jsonify(product_details), 200
-        
+        # Try to convert to int for database products
+        try:
+            int_product_id = int(product_id)
+            # This is a database product
+            product_details = ProductService.get_product_details(int_product_id)
+            return jsonify(product_details), 200
+        except ValueError:
+            # This is a scraped product with string ID
+            product_details = ProductService.get_scraped_product_details(product_id)
+            return jsonify(product_details), 200
+
     except Exception as e:
-        logger.error(f"Error getting product details: {str(e)}")
+        logger.error(f"Error getting product details for ID {product_id}: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 

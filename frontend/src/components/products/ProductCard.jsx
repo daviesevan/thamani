@@ -14,14 +14,22 @@ const ProductCard = ({ product, onClick, userId }) => {
     brand,
     image_url,
     price_info,
-    category
+    category,
+    retailers,
+    source
   } = product;
 
   const handleTrackProduct = async (e) => {
     e.stopPropagation(); // Prevent card click
-    
+
     if (!userId) {
       showToast('Please sign in to track products', 'error');
+      return;
+    }
+
+    // Check if this is a scraped product
+    if (source === 'web_scraping') {
+      showToast('Price tracking for live scraped products is coming soon! For now, bookmark this product or check back regularly for price updates.', 'info');
       return;
     }
 
@@ -65,14 +73,30 @@ const ProductCard = ({ product, onClick, userId }) => {
   };
 
   const getRetailerInfo = () => {
+    // For scraped products, show actual retailer names
+    if (source === 'web_scraping' && retailers && retailers.length > 0) {
+      const inStockRetailers = retailers.filter(r => r.in_stock);
+      if (inStockRetailers.length === 0) {
+        return 'Out of stock';
+      }
+
+      if (inStockRetailers.length === 1) {
+        return `Available at ${inStockRetailers[0].retailer_name || inStockRetailers[0].name}`;
+      } else {
+        const retailerNames = inStockRetailers.map(r => r.retailer_name || r.name).join(', ');
+        return `Available at ${retailerNames}`;
+      }
+    }
+
+    // For database products, use the original logic
     if (!price_info) return '';
-    
+
     const { retailers_count, total_retailers } = price_info;
-    
+
     if (retailers_count === 0) {
       return 'Out of stock';
     }
-    
+
     return `Available at ${retailers_count} retailer${retailers_count > 1 ? 's' : ''}`;
   };
 
@@ -181,7 +205,8 @@ const ProductCard = ({ product, onClick, userId }) => {
               size="sm"
               className="flex-1 text-xs"
               onClick={handleTrackProduct}
-              disabled={isTracking}
+              disabled={isTracking || source === 'web_scraping'}
+              title={source === 'web_scraping' ? 'Price tracking for live scraped products coming soon' : ''}
             >
               {isTracking ? (
                 <div className="flex items-center space-x-1">
@@ -190,6 +215,8 @@ const ProductCard = ({ product, onClick, userId }) => {
                 </div>
               ) : isTracked ? (
                 'Untrack'
+              ) : source === 'web_scraping' ? (
+                'Track Soon'
               ) : (
                 'Track Price'
               )}

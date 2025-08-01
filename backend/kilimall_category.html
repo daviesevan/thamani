@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html data-capo="">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0;" name="viewport"/>
+  <title>
+   Kilimall - Affordable Online Shopping in Kenya
+  </title>
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=AW-965268020">
+  </script>
+  <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-MBL06JR793">
+  </script>
+  <script async="" src="/js/regions-pwa.min.js">
+  </script>
+  <script src="/js/globalThis.min.js">
+  </script>
+  <style>
+   html{font-family:Open Sans,Roboto,Helvetica,sans-serif,Arial;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}html *{outline:0;-webkit-text-size-adjust:none;-webkit-tap-highlight-color:rgba(0,0,0,0)}body,html{font-family:Open Sans,Roboto,Helvetica,sans-serif,Arial;font-size:.38889rem}article,aside,blockquote,body,button,code,dd,details,div,dl,dt,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,hr,input,legend,li,menu,nav,ol,p,pre,section,td,textarea,th,ul{margin:0;padding:0}input,select,textarea{font-size:100%}table{border-collapse:collapse;border-spacing:0}fieldset,img{border:0}img[lazy=error],img[lazy=loading]{background:url(data:image/png;base64,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) #d4d4d6 50%/25% no-repeat;height:100%;width:auto}abbr,acronym{border:0;font-variant:normal}del{text-decoration:line-through}address,caption,cite,code,dfn,em,th,var{font-style:normal;font-weight:500}ol,ul{list-style:none}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:500}.clearfix:before,.clerafix:after{content:" ";display:table}.clerafix:after{clear:both}.hidden-scroll::-webkit-scrollbar{display:none}:root{box-sizing:border-box;--max_height:100vh}*,:after,:before{box-sizing:inherit}a{color:inherit}a,a:hover{text-decoration:none}.min-height-100vh{min-height:100vh}.van-rate__icon--full{color:var(--default_color)}.van-toast--html,.van-toast.van-toast--text{background-color:rgba(0,0,0,.65);border-radius:.11111rem;font-size:.47222rem;padding:.48611rem .55556rem}
+  </style>
+  <style>
+   :root{--default_color:#dd3131;--default_background_color:#f5f5f5;--default_font_color:#333;--default_font_size:.38889rem;--font_color_title:#150000;--font_color_01:#333;--font_color_02:#666;--font_color_03:#999;--font_color_04:#ccc;--font_color_05:#a9a9a9;--font_size_h1:.58333rem;--font_size_h2:.5rem;--font_size_h3:.44444rem;--main_color:#dd3131;--viewport-width:33.33333rem;--pc-default-color:#dd3131;--van-primary-color:#dd3131!important;--van-base-font:Open Sans,Roboto,Helvetica,sans-serif,Arial!important;--van-button-primary-background:linear-gradient(90deg,#f76900 -107.28%,#dd3131)!important}.k__page-content{padding-top:var(--van-nav-bar-height)}
+  </style>
+  <style>
+   .leaflet-image-layer,.leaflet-layer,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-pane,.leaflet-pane>canvas,.leaflet-pane>svg,.leaflet-tile,.leaflet-tile-container,.leaflet-zoom-box{left:0;position:absolute;top:0}.leaflet-container{overflow:hidden}.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-user-drag:none}.leaflet-tile::-moz-selection{background:transparent}.leaflet-tile::selection{background:transparent}.leaflet-safari .leaflet-tile{image-rendering:-webkit-optimize-contrast}.leaflet-safari .leaflet-tile-container{height:22.22222rem;-webkit-transform-origin:0 0;width:22.22222rem}.leaflet-marker-icon,.leaflet-marker-shadow{display:block}.leaflet-container .leaflet-overlay-pane svg{max-height:none!important;max-width:none!important}.leaflet-container .leaflet-marker-pane img,.leaflet-container .leaflet-shadow-pane img,.leaflet-container .leaflet-tile,.leaflet-container .leaflet-tile-pane img,.leaflet-container img.leaflet-image-layer{max-height:none!important;max-width:none!important;padding:0;width:auto}.leaflet-container img.leaflet-tile{mix-blend-mode:plus-lighter}.leaflet-container.leaflet-touch-zoom{touch-action:pan-x pan-y}.leaflet-container.leaflet-touch-drag{touch-action:none;touch-action:pinch-zoom}.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom{touch-action:none}.leaflet-container{-webkit-tap-highlight-color:transparent}.leaflet-container a{-webkit-tap-highlight-color:rgba(51,181,229,.4)}.leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}.leaflet-zoom-box{box-sizing:border-box;height:0;width:0;z-index:800}.leaflet-overlay-pane svg{-moz-user-select:none}.leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}.leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}.leaflet-vml-shape{height:.01389rem;width:.01389rem}.lvml{behavior:url(#default#VML);display:inline-block;position:absolute}.leaflet-control{pointer-events:visiblePainted;pointer-events:auto;position:relative;z-index:800}.leaflet-bottom,.leaflet-top{pointer-events:none;position:absolute;z-index:1000}.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-control{clear:both;float:left}.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:.13889rem}.leaflet-bottom .leaflet-control{margin-bottom:.13889rem}.leaflet-left .leaflet-control{margin-left:.13889rem}.leaflet-right .leaflet-control{margin-right:.13889rem}.leaflet-fade-anim .leaflet-popup{opacity:0;transition:opacity .2s linear}.leaflet-fade-anim .leaflet-map-pane .leaflet-popup{opacity:1}.leaflet-zoom-animated{transform-origin:0 0}svg.leaflet-zoom-animated{will-change:transform}.leaflet-zoom-anim .leaflet-zoom-animated{transition:transform .25s cubic-bezier(0,0,.25,1)}.leaflet-pan-anim .leaflet-tile,.leaflet-zoom-anim .leaflet-tile{transition:none}.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}.leaflet-interactive{cursor:pointer}.leaflet-grab{cursor:grab}.leaflet-crosshair,.leaflet-crosshair .leaflet-interactive{cursor:crosshair}.leaflet-control,.leaflet-popup-pane{cursor:auto}.leaflet-dragging .leaflet-grab,.leaflet-dragging .leaflet-grab .leaflet-interactive,.leaflet-dragging .leaflet-marker-draggable{cursor:move;cursor:grabbing}.leaflet-image-layer,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-pane>svg path,.leaflet-tile-container{pointer-events:none}.leaflet-image-layer.leaflet-interactive,.leaflet-marker-icon.leaflet-interactive,.leaflet-pane>svg path.leaflet-interactive,svg.leaflet-image-layer.leaflet-interactive path{pointer-events:visiblePainted;pointer-events:auto}.leaflet-container{background:#ddd;outline-offset:.01389rem}.leaflet-container a{color:#0078a8}.leaflet-zoom-box{background:rgba(255,255,255,.5);border:.02778rem dotted #38f}.leaflet-container{font-family:Helvetica Neue,Arial,Helvetica,sans-serif;font-size:.16667rem;font-size:.75rem;line-height:1.5}.leaflet-bar{border-radius:.05556rem;box-shadow:0 .01389rem .06944rem rgba(0,0,0,.65)}.leaflet-bar a{background-color:#fff;border-bottom:.01389rem solid #ccc;color:#000;display:block;height:.36111rem;line-height:.36111rem;text-align:center;text-decoration:none;width:.36111rem}.leaflet-bar a,.leaflet-control-layers-toggle{background-position:50% 50%;background-repeat:no-repeat;display:block}.leaflet-bar a:focus,.leaflet-bar a:hover{background-color:#f4f4f4}.leaflet-bar a:first-child{border-top-left-radius:.05556rem;border-top-right-radius:.05556rem}.leaflet-bar a:last-child{border-bottom:none;border-bottom-left-radius:.05556rem;border-bottom-right-radius:.05556rem}.leaflet-bar a.leaflet-disabled{background-color:#f4f4f4;color:#bbb;cursor:default}.leaflet-touch .leaflet-bar a{height:.41667rem;line-height:.41667rem;width:.41667rem}.leaflet-touch .leaflet-bar a:first-child{border-top-left-radius:.02778rem;border-top-right-radius:.02778rem}.leaflet-touch .leaflet-bar a:last-child{border-bottom-left-radius:.02778rem;border-bottom-right-radius:.02778rem}.leaflet-control-zoom-in,.leaflet-control-zoom-out{font:700 .25rem Lucida Console,Monaco,monospace;text-indent:.01389rem}.leaflet-touch .leaflet-control-zoom-in,.leaflet-touch .leaflet-control-zoom-out{font-size:.30556rem}.leaflet-control-layers{background:#fff;border-radius:.06944rem;box-shadow:0 .01389rem .06944rem rgba(0,0,0,.4)}.leaflet-control-layers-toggle{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAaCAQAAAADQ4RFAAACf0lEQVR4AY1UM3gkARTePdvdoTxXKc+qTl3aU5U6b2Kbkz3Gtq3Zw6ziLGNPzrYx7946Tr6/ee/XeCQ4D3ykPtL5tHno4n0d/h3+xfuWHGLX81cn7r0iTNzjr7LrlxCqPtkbTQEHeqOrTy4Yyt3VCi/IOB0v7rVC7q45Q3Gr5K6jt+3Gl5nCoDD4MtO+j96Wu8atmhGqcNGHObuf8OM/x3AMx38+4Z2sPqzCxRFK2aF2e5Jol56XTLyggAMTL56XOMoS1W4pOyjUcGGQdZxU6qRh7B9Zp+PfpOFlqt0zyDZckPi1ttmIp03jX8gyJ8a/PG2yutpS/Vol7peZIbZcKBAEEheEIAgFbDkz5H6Zrkm2hVWGiXKiF4Ycw0RWKdtC16Q7qe3X4iOMxruonzegJzWaXFrU9utOSsLUmrc0YjeWYjCW4PDMADElpJSSQ0vQvA1Tm6/JlKnqFs1EGyZiFCqnRZTEJJJiKRYzVYzJck2Rm6P4iH+cmSY0YzimYa8l0EtTODFWhcMIMVqdsI2uiTvKmTisIDHJ3od5GILVhBCarCfVRmo4uTjkhrhzkiBV7SsaqS+TzrzM1qpGGUFt28pIySQHR6h7F6KSwGWm97ay+Z+ZqMcEjEWebE7wxCSQwpkhJqoZA5ivCdZDjJepuJ9IQjGGUmuXJdBFUygxVqVsxFsLMbDe8ZbDYVCGKxs+W080max1hFCarCfV+C1KATwcnvE9gRRuMP2prdbWGowm1KB1y+zwMMENkM755cJ2yPDtqhTI6ED1M/82yIDtC/4j4BijjeObflpO9I9MwXTCsSX8jWAFeHr05WoLTJ5G8IQVS/7vwR6ohirYM7f6HzYpogfS3R2OAAAAAElFTkSuQmCC);height:.5rem;width:.5rem}.leaflet-retina .leaflet-control-layers-toggle{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADQAAAA0CAQAAABvcdNgAAAEsklEQVR4AWL4TydIhpZK1kpWOlg0w3ZXP6D2soBtG42jeI6ZmQTHzAxiTbSJsYLjO9HhP+WOmcuhciVnmHVQcJnp7DFvScowZorad/+V/fVzMdMT2g9Cv9guXGv/7pYOrXh2U+RRR3dSd9JRx6bIFc/ekqHI29JC6pJ5ZEh1yWkhkbcFeSjxgx3L2m1cb1C7bceyxA+CNjT/Ifff+/kDk2u/w/33/IeCMOSaWZ4glosqT3DNnNZQ7Cs58/3Ce5HL78iZH/vKVIaYlqzfdLu8Vi7dnvUbEza5Idt36tquZFldl6N5Z/POLof0XLK61mZCmJSWjVF9tEjUluu74IUXvgttuVIHE7YxSkaYhJZam7yiM9Pv82JYfl9nptxZaxMJE4YSPty+vF0+Y2up9d3wwijfjZbabqm/3bZ9ecKHsiGmRflnn1MW4pjHf9oLufyn2z3y1D6n8g8TZhxyzipLNPnAUpsOiuWimg52psrTZYnOWYNDTMuWBWa0tJb4rgq1UvmutpaYEbZlwU3CLJm/ayYjHW5/h7xWLn9Hh1vepDkyf7dE7MtT5LR4e7yYpHrkhOUpEfssBLq2pPhAqoSWKUkk7EDqkmK6RrCEzqDjhNDWNE+XSMvkJRDWlZTmCW0l0PHQGRZY5t1L83kT0Y3l2SItk5JAWHl2dCOBm+fPu3fo5/3v61RMCO9Jx2EEYYhb0rmNQMX/vm7gqOEJLcXTGw3CAuRNeyaPWwjR8PRqKQ1PDA/dpv+on9Shox52WFnx0KY8onHayrJzm87i5h9xGw/tfkev0jGsQizqezUKjk12hBMKJ4kbCqGPVNXudyyrShovGw5CgxsRICxF6aRmSjlBnHRzg7Gx8fKqEubI2rahQYdR1YgDIRQO7JvQyD52hoIQx0mxa0ODtW2Iozn1le2iIRdzwWewedyZzewidueOGqlsn1MvcnQpuVwLGG3/IR1hIKxCjelIDZ8ldqWz25jWAsnldEnK0Zxro19TGVb2ffIZEsIO89EIEDvKMPrzmBOQcKQ+rroye6NgRRxqR4U8EAkz0CL6uSGOm6KQCdWjvjRiSP1BPalCRS5iQYiEIvxuBMJEWgzSoHADcVMuN7IuqqTeyUPq22qFimFtxDyBBJEwNyt6TM88blFHao/6tWWhuuOM4SAK4EI4QmFHA+SEyWlp4EQoJ13cYGzMu7yszEIBOm2rVmHUNqwAIQabISNMRstmdhNWcFLsSm+0tjJH1MdRxO5Nx0WDMhCtgD6OKgZeljJqJKc9po8juskR9XN0Y1lZ3mWjLR9JCO1jRDMd0fpYC2VnvjBSEFg7wBENc0R9HFlb0xvF1+TBEpF68d+DHR6IOWVv2BECtxo46hOFUBd/APU57WIoEwJhIi2CdpyZX0m93BZicktMj1AS9dClteUFAUNUIEygRZCtik5zSxI9MubTBH1GOiHsiLJ3OCoSZkILa9PxiN0EbvhsAo8tdAf9Seepd36lGWHmtNANTv5Jd0z4QYyeo/UEJqxKRpg5LZx6btLPsOaEmdMyxYdlc8LMaJnikDlhclqmPiQnTEpLUIZEwkRagjYkEibQErwhkTAKCLQEbUgkzJQWc/0PstHHcfEdQ+UAAAAASUVORK5CYII=);background-size:.36111rem .36111rem}.leaflet-touch .leaflet-control-layers-toggle{height:.61111rem;width:.61111rem}.leaflet-control-layers .leaflet-control-layers-list,.leaflet-control-layers-expanded .leaflet-control-layers-toggle{display:none}.leaflet-control-layers-expanded .leaflet-control-layers-list{display:block;position:relative}.leaflet-control-layers-expanded{background:#fff;color:#333;padding:.08333rem .13889rem .08333rem .08333rem}.leaflet-control-layers-scrollbar{overflow-x:hidden;overflow-y:scroll;padding-right:.06944rem}.leaflet-control-layers-selector{margin-top:.02778rem;position:relative;top:.01389rem}.leaflet-control-layers label{display:block;font-size:.18056rem;font-size:1.08333em}.leaflet-control-layers-separator{border-top:.01389rem solid #ddd;height:0;margin:.06944rem -.13889rem .06944rem -.08333rem}.leaflet-default-icon-path{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAApCAYAAADAk4LOAAAFgUlEQVR4Aa1XA5BjWRTN2oW17d3YaZtr2962HUzbDNpjszW24mRt28p47v7zq/bXZtrp/lWnXr337j3nPCe85NcypgSFdugCpW5YoDAMRaIMqRi6aKq5E3YqDQO3qAwjVWrD8Ncq/RBpykd8oZUb/kaJutow8r1aP9II0WmLKLIsJyv1w/kqw9Ch2MYdB++12Onxee/QMwvf4/Dk/Lfp/i4nxTXtOoQ4pW5Aj7wpici1A9erdAN2OH64x8OSP9j3Ft3b7aWkTg/Fm91siTra0f9on5sQr9INejH6CUUUpavjFNq1B+Oadhxmnfa8RfEmN8VNAsQhPqF55xHkMzz3jSmChWU6f7/XZKNH+9+hBLOHYozuKQPxyMPUKkrX/K0uWnfFaJGS1QPRtZsOPtr3NsW0uyh6NNCOkU3Yz+bXbT3I8G3xE5EXLXtCXbbqwCO9zPQYPRTZ5vIDXD7U+w7rFDEoUUf7ibHIR4y6bLVPXrz8JVZEql13trxwue/uDivd3fkWRbS6/IA2bID4uk0UpF1N8qLlbBlXs4Ee7HLTfV1j54APvODnSfOWBqtKVvjgLKzF5YdEk5ewRkGlK0i33Eofffc7HT56jD7/6U+qH3Cx7SBLNntH5YIPvODnyfIXZYRVDPqgHtLs5ABHD3YzLuespb7t79FY34DjMwrVrcTuwlT55YMPvOBnRrJ4VXTdNnYug5ucHLBjEpt30701A3Ts+HEa73u6dT3FNWwflY86eMHPk+Yu+i6pzUpRrW7SNDg5JHR4KapmM5Wv2E8Tfcb1HoqqHMHU+uWDD7zg54mz5/2BSnizi9T1Dg4QQXLToGNCkb6tb1NU+QAlGr1++eADrzhn/u8Q2YZhQVlZ5+CAOtqfbhmaUCS1ezNFVm2imDbPmPng5wmz+gwh+oHDce0eUtQ6OGDIyR0uUhUsoO3vfDmmgOezH0mZN59x7MBi++WDL1g/eEiU3avlidO671bkLfwbw5XV2P8Pzo0ydy4t2/0eu33xYSOMOD8hTf4CrBtGMSoXfPLchX+J0ruSePw3LZeK0juPJbYzrhkH0io7B3k164hiGvawhOKMLkrQLyVpZg8rHFW7E2uHOL888IBPlNZ1FPzstSJM694fWr6RwpvcJK60+0HCILTBzZLFNdtAzJaohze60T8qBzyh5ZuOg5e7uwQppofEmf2++DYvmySqGBuKaicF1blQjhuHdvCIMvp8whTTfZzI7RldpwtSzL+F1+wkdZ2TBOW2gIF88PBTzD/gpeREAMEbxnJcaJHNHrpzji0gQCS6hdkEeYt9DF/2qPcEC8RM28Hwmr3sdNyht00byAut2k3gufWNtgtOEOFGUwcXWNDbdNbpgBGxEvKkOQsxivJx33iow0Vw5S6SVTrpVq11ysA2Rp7gTfPfktc6zhtXBBC+adRLshf6sG2RfHPZ5EAc4sVZ83yCN00Fk/4kggu40ZTvIEm5g24qtU4KjBrx/BTTH8ifVASAG7gKrnWxJDcU7x8X6Ecczhm3o6YicvsLXWfh3Ch1W0k8x0nXF+0fFxgt4phz8QvypiwCCFKMqXCnqXExjq10beH+UUA7+nG6mdG/Pu0f3LgFcGrl2s0kNNjpmoJ9o4B29CMO8dMT4Q5ox8uitF6fqsrJOr8qnwNbRzv6hSnG5wP+64C7h9lp30hKNtKdWjtdkbuPA19nJ7Tz3zR/ibgARbhb4AlhavcBebmTHcFl2fvYEnW0ox9xMxKBS8btJ+KiEbq9zA4RthQXDhPa0T9TEe69gWupwc6uBUphquXgf+/FrIjweHQS4/pduMe5ERUMHUd9xv8ZR98CxkS4F2n3EUrUZ10EYNw7BWm9x1GiPssi3GgiGRDKWRYZfXlON+dfNbM+GgIwYdwAAAAASUVORK5CYII=)}.leaflet-container .leaflet-control-attribution{background:#fff;background:rgba(255,255,255,.8);margin:0}.leaflet-control-attribution,.leaflet-control-scale-line{color:#333;line-height:1.4;padding:0 .06944rem}.leaflet-control-attribution a{text-decoration:none}.leaflet-control-attribution a:focus,.leaflet-control-attribution a:hover{text-decoration:underline}.leaflet-attribution-flag{display:inline!important;height:.6669em;vertical-align:baseline!important;width:1em}.leaflet-left .leaflet-control-scale{margin-left:.06944rem}.leaflet-bottom .leaflet-control-scale{margin-bottom:.06944rem}.leaflet-control-scale-line{background:rgba(255,255,255,.8);border:.02778rem solid #777;border-top:none;box-sizing:border-box;line-height:1.1;padding:.02778rem .06944rem .01389rem;text-shadow:.01389rem .01389rem #fff;white-space:nowrap}.leaflet-control-scale-line:not(:first-child){border-bottom:none;border-top:.02778rem solid #777;margin-top:-.02778rem}.leaflet-control-scale-line:not(:first-child):not(:last-child){border-bottom:.02778rem solid #777}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-attribution,.leaflet-touch .leaflet-control-layers{box-shadow:none}.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-control-layers{background-clip:padding-box;border:.02778rem solid rgba(0,0,0,.2)}.leaflet-popup{margin-bottom:.27778rem;position:absolute;text-align:center}.leaflet-popup-content-wrapper{border-radius:.16667rem;padding:.01389rem;text-align:left}.leaflet-popup-content{font-size:.18056rem;font-size:1.08333em;line-height:1.3;margin:.18056rem .33333rem .18056rem .27778rem;min-height:.01389rem}.leaflet-popup-content p{margin:1.3em 0}.leaflet-popup-tip-container{height:.27778rem;left:50%;margin-left:-.27778rem;margin-top:-.01389rem;overflow:hidden;pointer-events:none;position:absolute;width:.55556rem}.leaflet-popup-tip{height:.23611rem;margin:-.13889rem auto 0;padding:.01389rem;pointer-events:auto;transform:rotate(45deg);width:.23611rem}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#fff;box-shadow:0 .04167rem .19444rem rgba(0,0,0,.4);color:#333}.leaflet-container a.leaflet-popup-close-button{background:transparent;border:none;color:#757575;font:.22222rem/.33333rem Tahoma,Verdana,sans-serif;height:.33333rem;position:absolute;right:0;text-align:center;text-decoration:none;top:0;width:.33333rem}.leaflet-container a.leaflet-popup-close-button:focus,.leaflet-container a.leaflet-popup-close-button:hover{color:#585858}.leaflet-popup-scrolled{overflow:auto}.leaflet-oldie .leaflet-popup-content-wrapper{-ms-zoom:1}.leaflet-oldie .leaflet-popup-tip{-ms-filter:"progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)";filter:progid:DXImageTransform.Microsoft.Matrix(M11=.70710678,M12=.70710678,M21=-.70710678,M22=.70710678);margin:0 auto;width:.33333rem}.leaflet-oldie .leaflet-control-layers,.leaflet-oldie .leaflet-control-zoom,.leaflet-oldie .leaflet-popup-content-wrapper,.leaflet-oldie .leaflet-popup-tip{border:.01389rem solid #999}.leaflet-div-icon{background:#fff;border:.01389rem solid #666}.leaflet-tooltip{background-color:#fff;border:.01389rem solid #fff;border-radius:.04167rem;box-shadow:0 .01389rem .04167rem rgba(0,0,0,.4);color:#222;padding:.08333rem;pointer-events:none;position:absolute;-webkit-user-select:none;-moz-user-select:none;user-select:none;white-space:nowrap}.leaflet-tooltip.leaflet-interactive{cursor:pointer;pointer-events:auto}.leaflet-tooltip-bottom:before,.leaflet-tooltip-left:before,.leaflet-tooltip-right:before,.leaflet-tooltip-top:before{background:transparent;border:.08333rem solid transparent;content:"";pointer-events:none;position:absolute}.leaflet-tooltip-bottom{margin-top:.08333rem}.leaflet-tooltip-top{margin-top:-.08333rem}.leaflet-tooltip-bottom:before,.leaflet-tooltip-top:before{left:50%;margin-left:-.08333rem}.leaflet-tooltip-top:before{border-top-color:#fff;bottom:0;margin-bottom:-.16667rem}.leaflet-tooltip-bottom:before{border-bottom-color:#fff;margin-left:-.08333rem;margin-top:-.16667rem;top:0}.leaflet-tooltip-left{margin-left:-.08333rem}.leaflet-tooltip-right{margin-left:.08333rem}.leaflet-tooltip-left:before,.leaflet-tooltip-right:before{margin-top:-.08333rem;top:50%}.leaflet-tooltip-left:before{border-left-color:#fff;margin-right:-.16667rem;right:0}.leaflet-tooltip-right:before{border-right-color:#fff;left:0;margin-left:-.16667rem}@media print{.leaflet-control{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+  </style>
+  <style>
+   .k__yml-title{align-items:center;display:flex;font-size:.38889rem;font-weight:600;justify-content:center;padding:.34722rem 0;text-align:center}.k__yml-title:after{margin-left:.27778rem}.k__yml-title:after,.k__yml-title:before{background-color:#999;content:"";display:inline-block;height:.02778rem;width:1.38889rem}.k__yml-title:before{margin-right:.27778rem}#_app{background:#f5f8fb}.router-jump-animation{align-items:center;background-color:rgba(0,0,0,.05);bottom:0;display:flex;justify-content:center;left:0;position:fixed;right:0;top:0;z-index:100001}.router-jump-animation .loading-box-mobile{transform:scale(.7)}.router-jump-animation .loading-box{align-items:center;background-color:#fff;border-radius:50%;box-shadow:0 0 .16667rem #999;display:flex;height:1.66667rem;justify-content:center;margin-top:-2.77778rem;position:relative;width:1.66667rem}.router-jump-animation .loading-box img{width:50%}.router-jump-animation .loading-box .process-box{animation:rotate .8s linear infinite;background-image:url(https://img.kilimall.com/c/h5/loading_process_round.png?x-image-process=image/format,webp/resize,w_60);background-size:100%;height:1.72222rem;left:-.02778rem;position:absolute;top:-.02778rem;width:1.72222rem}@keyframes rotate{to{transform:rotate(1turn)}}
+  </style>
+  <style>
+   :host,:root{--van-tabbar-height:1.33333rem;--van-tabbar-z-index:1;--van-tabbar-background:var(--van-background-2)}.van-tabbar{background:var(--van-tabbar-background);box-sizing:content-box;display:flex;height:var(--van-tabbar-height);width:100%;z-index:var(--van-tabbar-z-index)}.van-tabbar--fixed{bottom:0;left:0;position:fixed}
+  </style>
+  <style>
+   :host,:root{--van-tabbar-item-font-size:var(--van-font-size-sm);--van-tabbar-item-text-color:var(--van-text-color);--van-tabbar-item-active-color:var(--van-primary-color);--van-tabbar-item-active-background:var(--van-background-2);--van-tabbar-item-line-height:1;--van-tabbar-item-icon-size:.58667rem;--van-tabbar-item-icon-margin-bottom:var(--van-padding-base)}.van-tabbar-item{align-items:center;color:var(--van-tabbar-item-text-color);cursor:pointer;display:flex;flex:1;flex-direction:column;font-size:var(--van-tabbar-item-font-size);justify-content:center;line-height:var(--van-tabbar-item-line-height)}.van-tabbar-item__icon{font-size:var(--van-tabbar-item-icon-size);margin-bottom:var(--van-tabbar-item-icon-margin-bottom)}.van-tabbar-item__icon .van-icon{display:block}.van-tabbar-item__icon .van-badge{margin-top:var(--van-padding-base)}.van-tabbar-item__icon img{display:block;height:.53333rem}.van-tabbar-item--active{background-color:var(--van-tabbar-item-active-background);color:var(--van-tabbar-item-active-color)}
+  </style>
+  <style>
+   .k__yml-title[data-v-9dd76b74]{align-items:center;display:flex;font-size:.38889rem;font-weight:600;justify-content:center;padding:.34722rem 0;text-align:center}.k__yml-title[data-v-9dd76b74]:after{margin-left:.27778rem}.k__yml-title[data-v-9dd76b74]:after,.k__yml-title[data-v-9dd76b74]:before{background-color:#999;content:"";display:inline-block;height:.02778rem;width:1.38889rem}.k__yml-title[data-v-9dd76b74]:before{margin-right:.27778rem}.tabbar-div[data-v-9dd76b74]{bottom:0;left:0;position:fixed}.tabbar-div .home-icon[data-v-9dd76b74]{border-radius:.05556rem}.cart-icon[data-v-9dd76b74]{font-size:.72222rem}.account-div[data-v-9dd76b74]{text-align:center}.account-div .badge-dot-div[data-v-9dd76b74]{background-color:red;border-radius:.27778rem;height:.22222rem;position:absolute;right:.38889rem;top:.11111rem;width:.22222rem}
+  </style>
+  <style>
+   .k__yml-title[data-v-8ce11ab2]{align-items:center;display:flex;font-size:.38889rem;font-weight:600;justify-content:center;padding:.34722rem 0;text-align:center}.k__yml-title[data-v-8ce11ab2]:after{margin-left:.27778rem}.k__yml-title[data-v-8ce11ab2]:after,.k__yml-title[data-v-8ce11ab2]:before{background-color:#999;content:"";display:inline-block;height:.02778rem;width:1.38889rem}.k__yml-title[data-v-8ce11ab2]:before{margin-right:.27778rem}.search-bar[data-v-8ce11ab2] .search-div{background-color:#f5f5f5!important}.youmaylike[data-v-8ce11ab2]{padding:.13889rem}.youmaylike .youmaylike-title[data-v-8ce11ab2]{font-size:.38889rem;font-weight:600;margin:.83333rem 0 .13889rem;text-align:left}.pc-youmaylike[data-v-8ce11ab2]{margin:2.22222rem auto .83333rem;width:var(--viewport-width)}.error-div[data-v-8ce11ab2]{background-color:#f5f5f5;padding:10vh 0;text-align:center}@media screen and (max-width:360px){.error-div .err-img[data-v-8ce11ab2]{min-height:8.33333rem;width:80%}}@media screen and (min-width:750px){.error-div .err-img[data-v-8ce11ab2]{height:7.77778rem}}.error-div .tips[data-v-8ce11ab2]{font-size:.36111rem;margin-top:.83333rem}.error-div .tips[data-mode=pc][data-v-8ce11ab2]{font-size:.38889rem}.error-div .to-home-btn[data-v-8ce11ab2]{background-color:var(--default_color);border-radius:.83333rem;color:#fff;cursor:pointer;display:inline-block;height:1.11111rem;line-height:1.11111rem;margin-top:.83333rem;width:5.55556rem}
+  </style>
+  <style>
+   .k__yml-title[data-v-25ccc003]{align-items:center;display:flex;font-size:.38889rem;font-weight:600;justify-content:center;padding:.34722rem 0;text-align:center}.k__yml-title[data-v-25ccc003]:after{margin-left:.27778rem}.k__yml-title[data-v-25ccc003]:after,.k__yml-title[data-v-25ccc003]:before{background-color:#999;content:"";display:inline-block;height:.02778rem;width:1.38889rem}.k__yml-title[data-v-25ccc003]:before{margin-right:.27778rem}.error-div[data-v-25ccc003]{padding:10vh 0;text-align:center}@media screen and (max-width:360px){.error-div .err-img[data-v-25ccc003]{min-height:8.33333rem;width:80%}}@media screen and (min-width:750px){.error-div .err-img[data-v-25ccc003]{height:7.77778rem}}.error-div .tips[data-v-25ccc003]{margin-top:.83333rem}.error-div .to-home-btn[data-v-25ccc003]{background-color:var(--default_color);border-radius:.83333rem;color:#fff;cursor:pointer;display:inline-block;height:1.11111rem;line-height:1.11111rem;margin-top:.83333rem;width:5.55556rem}
+  </style>
+  <style>
+   .k__yml-title[data-v-5a760540]{align-items:center;display:flex;font-size:.38889rem;font-weight:600;justify-content:center;padding:.34722rem 0;text-align:center}.k__yml-title[data-v-5a760540]:after{margin-left:.27778rem}.k__yml-title[data-v-5a760540]:after,.k__yml-title[data-v-5a760540]:before{background-color:#999;content:"";display:inline-block;height:.02778rem;width:1.38889rem}.k__yml-title[data-v-5a760540]:before{margin-right:.27778rem}.pc__header-box[data-v-5a760540]{background-color:#fff;box-shadow:0 .02778rem .05556rem #dddfe4}
+  </style>
+  <style>
+   .k__yml-title[data-v-7c1ee771]{align-items:center;display:flex;font-size:.38889rem;font-weight:600;justify-content:center;padding:.34722rem 0;text-align:center}.k__yml-title[data-v-7c1ee771]:after{margin-left:.27778rem}.k__yml-title[data-v-7c1ee771]:after,.k__yml-title[data-v-7c1ee771]:before{background-color:#999;content:"";display:inline-block;height:.02778rem;width:1.38889rem}.k__yml-title[data-v-7c1ee771]:before{margin-right:.27778rem}.pc__header-banner[data-v-7c1ee771]{height:0;padding-bottom:3.64%;position:relative;text-align:center;width:100%}.pc__header-banner img[data-v-7c1ee771]{bottom:0;height:100%;left:0;position:absolute;right:0;top:0;vertical-align:middle;width:100%}
+  </style>
+  <style>
+   .k__yml-title[data-v-8c45576b]{align-items:center;display:flex;font-size:.38889rem;font-weight:600;justify-content:center;padding:.34722rem 0;text-align:center}.k__yml-title[data-v-8c45576b]:after{margin-left:.27778rem}.k__yml-title[data-v-8c45576b]:after,.k__yml-title[data-v-8c45576b]:before{background-color:#999;content:"";display:inline-block;height:.02778rem;width:1.38889rem}.k__yml-title[data-v-8c45576b]:before{margin-right:.27778rem}.tool-bar[data-v-8c45576b]{background-color:#f5f7fa;color:#666;font-size:.44444rem;height:1rem}.tool-bar .inner-tool-bar[data-v-8c45576b]{align-items:center;display:flex;justify-content:space-between;margin:0 auto;width:var(--viewport-width)}.tool-bar .content[data-v-8c45576b]{align-items:center;display:flex;flex:1;height:1rem}.tool-bar .content .inner[data-v-8c45576b]{align-items:center;cursor:pointer;display:flex;padding:0 .27778rem;position:relative;transition:color .2s;z-index:2001}.tool-bar .content .inner img[data-v-8c45576b]{margin-right:.13889rem}.tool-bar .content .inner[data-v-8c45576b]:hover{color:var(--pc-default-color)}.tool-bar .content .inner .region[data-v-8c45576b]{align-items:center;display:flex}.tool-bar .content .inner .region .cur-r-name[data-v-8c45576b]{margin:0 .13889rem}.tool-bar .right-content[data-v-8c45576b]{justify-content:flex-end;text-align:right}.tool-bar .left-content[data-v-8c45576b]{text-align:left}.select-region-wrapper[data-v-8c45576b]{left:0}.select-app-download-wrapper[data-v-8c45576b]{left:-50%}.select-wrapper[data-v-8c45576b]{background-color:#fff;border-radius:.16667rem;box-shadow:0 0 .08333rem #999;height:0;overflow:hidden;position:absolute;top:100%;transition:all .2s;z-index:10001}.select-wrapper .select-wrapper-inner[data-v-8c45576b]{background-color:#fff;padding:.41667rem}.select-wrapper .app-title[data-v-8c45576b]{font-size:.44444rem;font-weight:600;padding:0 .09722rem}.select-wrapper .app-title-desc[data-v-8c45576b]{color:#333;margin:.27778rem 0;padding:0 .09722rem}.select-wrapper .download-img[data-v-8c45576b]{margin-bottom:.13889rem;width:100%}.select-wrapper .region-list .region-item[data-v-8c45576b]{align-items:center;border-bottom:.01389rem solid #efefef;color:#333;cursor:pointer;display:flex;margin-bottom:.27778rem;padding-bottom:.27778rem}.select-wrapper .region-list .region-item[data-v-8c45576b]:last-child{border-bottom:none;padding-bottom:0}.select-wrapper .region-list .region-item[data-v-8c45576b]:hover{color:var(--pc-default-color)}.app-inner[data-v-8c45576b]{align-items:center;display:flex;height:1rem}.app-inner .phone-icon[data-v-8c45576b]{height:.58333rem}.app-inner:hover .select-wrapper[data-v-8c45576b]{height:auto}.region-flag[data-v-8c45576b]{height:.55556rem;width:.83333rem}
+  </style>
+  <style>
+   .k__yml-title[data-v-0920c726]{align-items:center;display:flex;font-size:.38889rem;font-weight:600;justify-content:center;padding:.34722rem 0;text-align:center}.k__yml-title[data-v-0920c726]:after{margin-left:.27778rem}.k__yml-title[data-v-0920c726]:after,.k__yml-title[data-v-0920c726]:before{background-color:#999;content:"";display:inline-block;height:.02778rem;width:1.38889rem}.k__yml-title[data-v-0920c726]:before{margin-right:.27778rem}.search-bar[data-v-0920c726]{display:flex;height:3.05556rem;margin:0 auto;padding:.55556rem 0;position:relative;width:var(--viewport-width);z-index:99}.search-bar .logo[data-v-0920c726]{min-width:4.55556rem}.search-bar .logo img[data-v-0920c726]{height:1.5rem;-o-object-fit:contain;object-fit:contain;width:4.55556rem}.search-bar .search-input-box[data-v-0920c726]{flex:1;padding-left:.83333rem;position:relative}.search-bar .search-input-box .input[data-v-0920c726]{align-items:center;border:.05556rem solid var(--pc-default-color);border-radius:.13889rem;display:flex;height:1.05556rem;justify-content:center;overflow:hidden;padding:.13889rem .41667rem;position:relative}.search-bar .search-input-box .input .search-button[data-v-0920c726]{align-items:center;background-color:var(--pc-default-color);bottom:0;color:#fff;cursor:pointer;display:inline-block;display:flex;font-size:.47222rem;height:100%;justify-content:center;position:absolute;right:0;top:0;width:1.66667rem}.search-bar .search-input-box .input .search-button img[data-v-0920c726]{height:.66667rem;width:.66667rem}.search-bar .search-input-box .input[data-v-0920c726] .van-cell{padding:0!important}.search-bar .search-input-box .search-hots[data-v-0920c726]{font-size:.36111rem;height:.83333rem;line-height:.69444rem;max-width:19.44444rem;overflow:hidden;padding-top:.20833rem}.search-bar .search-input-box .search-hots .hot-label[data-v-0920c726]{margin-right:.27778rem}.search-bar .search-input-box .search-hots .hot-key[data-v-0920c726]{cursor:pointer;display:inline-block;margin-right:.41667rem;transition:color .1s;white-space:nowrap}.search-bar .search-input-box .search-hots .hot-key[data-v-0920c726]:hover{color:var(--pc-default-color)}.search-bar .opt-btn[data-v-0920c726]{align-items:center;cursor:pointer;display:flex;height:1.11111rem;justify-content:center;margin-left:.83333rem;transition:color .2s}.search-bar .opt-btn .label[data-v-0920c726]{display:inline-block;margin-top:.27778rem;padding:0 .20833rem}.search-bar .opt-btn i[data-v-0920c726]{margin-top:.20833rem}.search-bar .opt-btn .jt[data-v-0920c726]{transform:rotate(90deg)}.search-bar .opt-btn[data-v-0920c726]:hover{color:var(--pc-default-color)}.search-bar .opt-btn .opt-btn-content[data-v-0920c726]{align-items:center;display:flex}.search-bar .opt-btn .opt-btn-icon[data-v-0920c726]{width:.88889rem}.shopping-title[data-v-0920c726]{border-bottom:.01389rem solid #efefef;font-size:.41667rem;padding:.41667rem}.cart-list-body[data-v-0920c726]{width:11.11111rem}.shopping-list[data-v-0920c726]{max-height:7.22222rem;overflow:auto;padding:0 .41667rem}.shopping-list .cart-item[data-v-0920c726]{cursor:pointer;display:flex;font-size:.44444rem;margin-top:.27778rem;padding:.27778rem 0;transition:color .15s;width:100%}.shopping-list .cart-item .product-image[data-v-0920c726]{height:1.11111rem;-o-object-fit:contain;object-fit:contain;width:1.11111rem}.shopping-list .cart-item .product-title[data-v-0920c726]{display:-webkit-box;flex:1;overflow:hidden;padding:0 .55556rem;-webkit-box-orient:vertical;text-overflow:ellipsis;-webkit-line-clamp:2;line-height:.55556rem}.shopping-list .cart-item .product-price[data-v-0920c726]{color:var(--pc-default-color);font-weight:600;padding-right:.13889rem}.shopping-list .cart-item[data-v-0920c726]:hover{color:var(--pc-default-color)}.my-list-body[data-v-0920c726]{padding-top:.27778rem}.my-opt-item[data-v-0920c726]{align-items:center;cursor:pointer;display:flex;font-size:.44444rem;padding:.13889rem .41667rem;transition:all .15s;white-space:nowrap}.my-opt-item[data-v-0920c726]:hover{color:var(--pc-default-color)}.my-opt-item .my-opt-label[data-v-0920c726]{margin-left:.27778rem}.my-opt-item[data-v-0920c726]:last-child{border-bottom:.02778rem solid #cacaca;margin-bottom:.27778rem}.view-cart-btn[data-v-0920c726]{margin:.41667rem;width:calc(100% - .83333rem)}.no-data[data-v-0920c726]{color:#999;font-size:.38889rem;padding:.41667rem 0;text-align:center}.associative-words[data-v-0920c726]{background-color:#fff;border:.01389rem solid #efefef;border-radius:.16667rem;box-shadow:0 0 .05556rem #cacaca;left:.83333rem;max-height:13.88889rem;overflow-y:auto;position:absolute;right:2.5rem;top:1.11111rem;z-index:9}.associative-words[data-v-0920c726]::-webkit-scrollbar{display:none}.associative-words[data-v-0920c726]:hover::-webkit-scrollbar{display:block}.associative-words[data-v-0920c726]::-webkit-scrollbar{height:"";width:.16667rem}.associative-words[data-v-0920c726]::-webkit-scrollbar-track{background:#b3b1b1;border-radius:.13889rem}.associative-words[data-v-0920c726]::-webkit-scrollbar-thumb{background:#888;border-radius:.13889rem}.associative-words[data-v-0920c726]::-webkit-scrollbar-thumb:active,.associative-words[data-v-0920c726]::-webkit-scrollbar-thumb:hover{background:rgba(221,49,49,.6);border-radius:.13889rem}.associative-words .keyword[data-v-0920c726]{cursor:pointer;padding:.34722rem .41667rem}.associative-words .keyword[data-v-0920c726]:hover{background-color:#efefef;color:var(--pc-default-color)}
+  </style>
+  <style>
+   .k__yml-title[data-v-6bb4f510]{align-items:center;display:flex;font-size:.38889rem;font-weight:600;justify-content:center;padding:.34722rem 0;text-align:center}.k__yml-title[data-v-6bb4f510]:after{margin-left:.27778rem}.k__yml-title[data-v-6bb4f510]:after,.k__yml-title[data-v-6bb4f510]:before{background-color:#999;content:"";display:inline-block;height:.02778rem;width:1.38889rem}.k__yml-title[data-v-6bb4f510]:before{margin-right:.27778rem}ul li[data-v-6bb4f510]{list-style:none}.footer[data-v-6bb4f510]{background:#f0f0f0;margin:auto;overflow:hidden;padding:.83333rem 0}.navfooter[data-v-6bb4f510]{font-size:.38889rem;margin:0 auto;padding:0;position:relative;width:var(--viewport-width)}.navfooter ul[data-v-6bb4f510]{color:#333;height:100%;margin:0;padding:0}.footerleft>div.footeritem[data-v-6bb4f510]:nth-child(4){padding-left:.55556rem}.navfooterhead[data-v-6bb4f510]{color:#333;font-size:.5rem;font-weight:700}.footerleft .footeritem ul li[data-v-6bb4f510]:hover{cursor:pointer;text-decoration:underline}.navfooter .footerleft[data-v-6bb4f510]{display:flex;justify-content:space-between;line-height:.77778rem}.navfooter .footerleft .footeritem[data-v-6bb4f510]{text-align:left}.footerleft .navfooterhead[data-v-6bb4f510]{padding-bottom:.55556rem}.stay-connected[data-v-6bb4f510]{align-items:center;border-bottom:.01389rem solid #d9d9d9;display:flex;margin:0 auto .55556rem;padding:.55556rem 0;width:var(--viewport-width)}.stay-connected .title-text[data-v-6bb4f510]{color:#333;font-size:.5rem;font-weight:600}.stay-connected .download-app[data-v-6bb4f510]{margin-left:2.77778rem}.stay-connected .google-play-icon[data-v-6bb4f510]{display:inline-block;height:.83333rem;margin-left:.55556rem}.stay-connected .stay-icons[data-v-6bb4f510]{display:flex}.stay-connected .stay-icons img[data-v-6bb4f510]{height:.83333rem;margin:0 .41667rem;width:.83333rem}.googleplay[data-v-6bb4f510]{background:url(https://image.kilimall.com/kenya/PcImages/footerappad/google_play.png?v=20180806001);background-repeat:no-repeat;height:.66667rem;line-height:.66667rem;margin-bottom:.22222rem;width:3.16667rem}.googleplay a[data-v-6bb4f510]{display:inline-block;height:100%;width:100%}.appPromo .raddo[data-v-6bb4f510]{margin-top:-.36111rem}.supportedPayment[data-v-6bb4f510]{border:.02778rem #eaeaea;margin:auto;width:var(--viewport-width)}.brand-div[data-v-6bb4f510]{display:flex;margin:.83333rem auto 0;padding-bottom:.27778rem;width:var(--viewport-width)}.brand-div .brand-item[data-v-6bb4f510]{flex:1;width:1.38889rem}.brand-div .brand-item .brand-title[data-v-6bb4f510]{display:block;font-size:.33333rem;line-height:.83333rem}.supportedPayment[data-v-6bb4f510] .paymentICONLIST{display:flex;margin-bottom:.27778rem}.paymentICONLIST li[data-v-6bb4f510]{flex:1}.paymentICONLIST li img[data-v-6bb4f510]{display:block;height:1.19444rem;width:2.41667rem}.spwrapper1[data-v-6bb4f510]{font-size:.5rem;font-weight:700;padding:.80556rem 0 .55556rem}.supportedPayment .banner[data-v-6bb4f510]{margin:0 auto;width:var(--viewport-width)}.spTitle1[data-v-6bb4f510]{font-size:.5rem;font-weight:700;margin:.27778rem 0}.soild[data-v-6bb4f510]{border-bottom:.02778rem solid #eaeaea;height:.02778rem}.wrapper[data-v-6bb4f510]{color:#333;font-weight:400;line-height:.44444rem;margin:0 auto;padding:.83333rem 0;width:var(--viewport-width)}.copyright[data-v-6bb4f510],.wrapper[data-v-6bb4f510]{font-size:.33333rem;text-align:center}.copyright[data-v-6bb4f510]{color:#999;padding:.41667rem 0}
+  </style>
+  <link href="https://img.kilimall.com/c/h5/_nuxt/2025073010/entry.tv4_MDjh.css" rel="stylesheet"/>
+  <link href="https://img.kilimall.com/c/h5/_nuxt/2025073010/lipapay-sdk.BlVBUjuO.css" rel="stylesheet"/>
+  <link href="https://img.kilimall.com/c/h5/_nuxt/2025073010/wap-listing-widgets.BjFJJZ_7.css" rel="stylesheet"/>
+  <link href="https://img.kilimall.com/c/h5/_nuxt/2025073010/mobile-components.CHLx5Gbx.css" rel="stylesheet"/>
+  <link href="https://img.kilimall.com/c/h5/_nuxt/2025073010/pc-components.NnU24mbR.css" rel="stylesheet"/>
+  <link href="https://img.kilimall.com/c/h5/_nuxt/2025073010/pc-listing-widgets.DZ14FnVJ.css" rel="stylesheet"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/BUaqMA1f.js" rel="modulepreload"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/Id8IkHK4.js" rel="modulepreload"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/DYmAQdQY.js" rel="modulepreload"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/PILuJLNd.js" rel="modulepreload"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/DxZsTG8U.js" rel="modulepreload"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/Dmw5Y_Us.js" rel="modulepreload"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/i8XD7LKU.js" rel="modulepreload"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/CKY2sDRD.js" rel="modulepreload"/>
+  <link as="style" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/afterSalePc.DiaYag9M.css" rel="prefetch"/>
+  <link as="style" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/index.D5vKTzmL.css" rel="prefetch"/>
+  <link as="style" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/pc-user-center.CnkjxRA0.css" rel="prefetch"/>
+  <link as="style" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/pc-widgets.BQFnAzr1.css" rel="prefetch"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/BXmIziRQ.js" rel="prefetch"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/CIxOEF_c.js" rel="prefetch"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/fxcB0Cdj.js" rel="prefetch"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/BL3J-367.js" rel="prefetch"/>
+  <link as="style" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/_categoryName_.BxMZEiQW.css" rel="prefetch"/>
+  <link as="style" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/KHeader.BahCeGh8.css" rel="prefetch"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/DuaTTKZn.js" rel="prefetch"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/C0sKkKgi.js" rel="prefetch"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/FjD9oIKs.js" rel="prefetch"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/DxMsEaqq.js" rel="prefetch"/>
+  <link as="style" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/wap-store-cms.Cthz0aN3.css" rel="prefetch"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/CwEkhukG.js" rel="prefetch"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/Da41fmbC.js" rel="prefetch"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/BSbXf5RP.js" rel="prefetch"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/BhOr_CPl.js" rel="prefetch"/>
+  <link as="style" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/wap-widgets.D5b1GQJG.css" rel="prefetch"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/DCxbwftW.js" rel="prefetch"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/C9t5zsRy.js" rel="prefetch"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/Bj5KxbWd.js" rel="prefetch"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/COGfsofF.js" rel="prefetch"/>
+  <link as="style" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/PWAPromptPopup.Kg4nmolj.css" rel="prefetch"/>
+  <link as="script" crossorigin="" href="https://img.kilimall.com/c/h5/_nuxt/2025073010/BuBBq8WT.js" rel="prefetch"/>
+  <meta content="online Shopping; discount shopping; fast delivery; mobile phones; laptop; women’s fashion; men’s fashion; Samsung; OPPO; Vivo; Huawei; Apple; shoes; home appliance; home&amp; living; Black Friday; Christmas Sale; Kilimall Anniversary" name="keywords"/>
+  <meta content="OkbLQWAI5EwE1ZYBnoqkWAOIASsjGbOvnK09aFksCsY" name="google-site-verification"/>
+  <meta content="kaecobftnbyknc6ln51jgopse42kfi" name="facebook-domain-verification"/>
+  <link crossorigin="use-credentials" href="/js/manifest.webmanifest" rel="manifest"/>
+  <link href="https://image.kilimall.com/kenya/new_wap/logo/icon_48.ico" rel="icon" type="image/x-icon"/>
+  <script>
+   window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'AW-965268020');
+  </script>
+  <script>
+   window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-MBL06JR793');
+  </script>
+  <script>
+   !function (w, d, t) {
+            w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
+          var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
+          ;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
+
+
+            ttq.load('D0VVQ3BC77U53580QC7G');
+            ttq.page();
+          }(window, document, 'ttq');
+  </script>
+  <meta content="noindex, nofollow" name="robots"/>
+  <meta content="noindex, nofollow" name="X-Robots-Tag"/>
+  <script crossorigin="" src="https://img.kilimall.com/c/h5/_nuxt/2025073010/BUaqMA1f.js" type="module">
+  </script>
+  <script crossorigin="" src="https://img.kilimall.com/c/h5/_nuxt/2025073010/i8XD7LKU.js" type="module">
+  </script>
+  <script id="unhead:payload" type="application/json">
+   {"title":"Kilimall - Affordable Online Shopping in Kenya"}
+  </script>
+ </head>
+ <body>
+  <!--teleport start anchor-->
+  <!-- -->
+  <!-- -->
+  <!--teleport anchor-->
+  <!--teleport start anchor-->
+  <!-- -->
+  <!-- -->
+  <!--teleport anchor-->
+  <div id="__nuxt">
+   <!--[-->
+   <div class="nuxt-loading-indicator" style="position:fixed;top:0;right:0;left:0;pointer-events:none;width:auto;height:3px;opacity:0;background:linear-gradient(90deg,#ff582b,#ff2642);background-size:Infinity% auto;transform:scaleX(0%);transform-origin:left;transition:transform 0.1s, height 0.4s, opacity 0.4s;z-index:999999;">
+   </div>
+   <!--[-->
+   <div class="router-jump-animation">
+    <div class="loading-box">
+     <img src="https://img.kilimall.com/c/h5/loading_default.png"/>
+     <div class="process-box">
+     </div>
+    </div>
+   </div>
+   <!--[-->
+   <div class="pc__header-box" data-v-25ccc003="" data-v-5a760540="">
+    <div class="pc__header-banner" data-v-5a760540="" data-v-7c1ee771="" style="display:none;">
+     <!-- -->
+    </div>
+    <div class="tool-bar" data-v-5a760540="" data-v-8c45576b="">
+     <div class="inner-tool-bar" data-v-8c45576b="">
+      <div class="content left-content" data-v-8c45576b="">
+       <a data-v-8c45576b="" href="https://seller.kilimall.ke/login" target="_blank">
+        <span class="inner" data-v-8c45576b="">
+         Seller Center
+        </span>
+       </a>
+       <span class="inner app-inner" data-v-8c45576b="">
+        <img alt="" class="phone-icon" data-v-8c45576b="" src="https://img.kilimall.com/c/h5/imgs/phone-icon@2x.png"/>
+        <span data-v-8c45576b="">
+         Download App
+        </span>
+        <div class="select-wrapper select-app-download-wrapper" data-v-8c45576b="">
+         <div class="select-wrapper-inner" data-v-8c45576b="">
+          <p class="app-title" data-v-8c45576b="">
+           Download our Cool FREE APP!
+          </p>
+          <p class="app-title-desc" data-v-8c45576b="">
+           Enjoy App-EXCLUSIVE Deals
+          </p>
+          <img alt="" class="download-img" data-v-8c45576b=""/>
+          <a data-v-8c45576b="" href="/downloadApp" target="_blank">
+           <img alt="" class="google-img" data-v-8c45576b="" src="https://image.kilimall.com/kenya/PcImages/static/google-play.png"/>
+          </a>
+         </div>
+        </div>
+       </span>
+      </div>
+      <div class="content right-content" data-v-8c45576b="">
+       <a data-v-8c45576b="" href="/help-center/home?s_id=1004&amp;bs_type=1&amp;c_id=1020" target="_blank">
+        <span class="inner" data-v-8c45576b="">
+         Help Center
+        </span>
+       </a>
+       <div class="inner app-inner" data-v-8c45576b="">
+        <div class="region" data-v-8c45576b="">
+         <img alt="" class="region-flag" data-v-8c45576b="" src="https://image.kilimall.com/lite/common/country-flags/100000001.jpg"/>
+         <span class="cur-r-name" data-v-8c45576b="">
+          Kenya
+         </span>
+         <i class="van-badge__wrapper van-icon van-icon-arrow-down" data-v-8c45576b="" style="">
+          <!--[-->
+          <!-- -->
+          <!-- -->
+          <!--]-->
+          <!-- -->
+         </i>
+        </div>
+        <div class="select-wrapper select-region-wrapper" data-v-8c45576b="">
+         <div class="select-wrapper-inner region-list" data-v-8c45576b="">
+          <!--[-->
+          <div class="region-item" data-v-8c45576b="">
+           <img alt="" class="region-flag" data-v-8c45576b=""/>
+           <span data-v-8c45576b="">
+            Kenya
+           </span>
+          </div>
+          <!--]-->
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+    <div class="search-bar" data-v-0920c726="" data-v-5a760540="">
+     <div class="logo" data-v-0920c726="">
+      <img alt="" data-v-0920c726="" src="https://img.kilimall.com/c/h5/icon_164_x3.png"/>
+     </div>
+     <div class="search-input-box" data-v-0920c726="">
+      <div class="input" data-v-0920c726="" id="pc__search-input">
+       <div class="van-cell van-field" data-v-0920c726="">
+        <!-- -->
+        <!-- -->
+        <div class="van-cell__value van-field__value">
+         <!--[-->
+         <div class="van-field__body">
+          <input class="van-field__control" id="van-field-1108364-input" placeholder="I'm looking for..." type="text"/>
+          <!-- -->
+          <!-- -->
+          <!-- -->
+         </div>
+         <!-- -->
+         <!-- -->
+         <!--]-->
+        </div>
+        <!-- -->
+        <!-- -->
+       </div>
+       <div class="search-button" data-v-0920c726="">
+        <img alt="" data-v-0920c726="" src="https://img.kilimall.com/c/h5/imgs/search-icon@2x.png"/>
+       </div>
+      </div>
+      <div class="search-hots" data-v-0920c726="">
+       <span class="hot-keys" data-v-0920c726="">
+        <!--[-->
+        <!--]-->
+       </span>
+      </div>
+      <div class="associative-words" data-v-0920c726="" style="display:none;">
+       <!--[-->
+       <!--]-->
+      </div>
+     </div>
+     <div class="opt-btn cart" data-v-0920c726="">
+      <div data-v-0920c726="">
+       <div>
+        <!--[-->
+        <span class="van-popover__wrapper">
+         <!--[-->
+         <!--[-->
+         <div class="opt-btn-content" data-v-0920c726="">
+          <div class="van-badge__wrapper" data-v-0920c726="">
+           <!--[-->
+           <img alt="" class="opt-btn-icon" data-v-0920c726="" src="https://img.kilimall.com/c/h5/imgs/cart-icon@2x.png"/>
+           <!--]-->
+           <!-- -->
+          </div>
+          <span class="label" data-v-0920c726="">
+           Cart
+          </span>
+          <i class="van-badge__wrapper van-icon van-icon-play jt" data-v-0920c726="" style="font-size:14px;">
+           <!--[-->
+           <!-- -->
+           <!-- -->
+           <!--]-->
+           <!-- -->
+          </i>
+         </div>
+         <!--]-->
+         <!--]-->
+        </span>
+        <!--teleport start-->
+        <!--teleport end-->
+        <!--]-->
+       </div>
+      </div>
+     </div>
+     <div class="opt-btn my" data-v-0920c726="">
+      <div data-v-0920c726="">
+       <div>
+        <!--[-->
+        <span class="van-popover__wrapper">
+         <!--[-->
+         <!--[-->
+         <div class="opt-btn-content" data-v-0920c726="">
+          <div class="van-badge__wrapper" data-v-0920c726="">
+           <!--[-->
+           <img alt="" class="opt-btn-icon" data-v-0920c726="" src="https://img.kilimall.com/c/h5/imgs/user-icon@2x.png"/>
+           <!--]-->
+           <!-- -->
+          </div>
+          <span class="label" data-v-0920c726="">
+           My Account
+          </span>
+          <i class="van-badge__wrapper van-icon van-icon-play jt" data-v-0920c726="" style="font-size:14px;">
+           <!--[-->
+           <!-- -->
+           <!-- -->
+           <!--]-->
+           <!-- -->
+          </i>
+         </div>
+         <!--]-->
+         <!--]-->
+        </span>
+        <!--teleport start-->
+        <!--teleport end-->
+        <!--]-->
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="error-div" data-v-25ccc003="">
+    <img class="err-img" data-v-25ccc003=""/>
+    <div class="tips" data-v-25ccc003="">
+     The page you are trying to access is not available.
+    </div>
+    <a class="to-home-btn" data-v-25ccc003="" href="/">
+     Go to homepage
+    </a>
+   </div>
+   <div data-v-25ccc003="" data-v-6bb4f510="">
+    <div class="footer" data-v-6bb4f510="">
+     <div class="navfooter" data-v-6bb4f510="">
+      <div class="footerleft" data-v-6bb4f510="">
+       <!--[-->
+       <div class="footeritem" data-v-6bb4f510="">
+        <div class="navfooterhead" data-v-6bb4f510="">
+         Shopping Guide
+        </div>
+        <ul data-v-6bb4f510="">
+         <!--[-->
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="/help-center/oh_3448?s_id=1004&amp;bs_type=1&amp;c_id=1096">
+           How do I pay on Kilimall?
+          </a>
+         </li>
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="/help-center/oh_3503?c_id=1096&amp;s_id=1004&amp;bs_type=1">
+           Flash Sale
+          </a>
+         </li>
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="/help-center/oh_3445?s_id=1004&amp;bs_type=1&amp;c_id=1098">
+           How to apply aftersale/ Refund
+          </a>
+         </li>
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="/help-center/oh_3438?s_id=1004&amp;bs_type=1&amp;c_id=10">
+           how long does my order arrive?(Redirection)
+          </a>
+         </li>
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="/help-center/oh_3441?s_id=1004&amp;bs_type=1&amp;c_id=1096">
+           How to shop on Kilimall
+          </a>
+         </li>
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="/help-center/oh_3478?s_id=1004&amp;bs_type=1&amp;c_id=1096">
+           Forgot Password?
+          </a>
+         </li>
+         <!--]-->
+        </ul>
+       </div>
+       <div class="footeritem" data-v-6bb4f510="">
+        <div class="navfooterhead" data-v-6bb4f510="">
+         Customer Help Center
+        </div>
+        <ul data-v-6bb4f510="">
+         <!--[-->
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="/help-center/oh_3482?s_id=1004&amp;bs_type=1&amp;c_id=1096">
+           Dispute resolution policy
+          </a>
+         </li>
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="/help-center/oh_3467?c_id=1083&amp;s_id=1004&amp;bs_type=1">
+           Privacy Policy
+          </a>
+         </li>
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="/help-center/oh_3537?c_id=1083&amp;s_id=1004&amp;bs_type=1">
+           Terms and Conditions
+          </a>
+         </li>
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="/help-center/home?s_id=1004&amp;bs_type=1&amp;c_id=1087">
+           Account Settings
+          </a>
+         </li>
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="/help-center/oh_3348?s_id=1004&amp;bs_type=1&amp;c_id=1087">
+           After Sale Policy
+          </a>
+         </li>
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="/help-center/home?s_id=1004&amp;bs_type=1&amp;c_id=1085">
+           Delivery and Shipping
+          </a>
+         </li>
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="/help-center/home?s_id=1004&amp;bs_type=1&amp;c_id=1020">
+           FAQ Center
+          </a>
+         </li>
+         <!--]-->
+        </ul>
+       </div>
+       <div class="footeritem" data-v-6bb4f510="">
+        <div class="navfooterhead" data-v-6bb4f510="">
+         Business
+        </div>
+        <ul data-v-6bb4f510="">
+         <!--[-->
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="https://seller.kilimall.ke/create-seller-account/step1">
+           Want to be a seller?
+          </a>
+         </li>
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="/help-center/home?s_id=1006&amp;bs_type=2&amp;c_id=1149">
+           Seller University
+          </a>
+         </li>
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="https://webstore.kilimall.ke/kilipartner-apply">
+           KiliShop
+          </a>
+         </li>
+         <!--]-->
+        </ul>
+       </div>
+       <div class="footeritem" data-v-6bb4f510="">
+        <div class="navfooterhead" data-v-6bb4f510="">
+         Kilimall International
+        </div>
+        <ul data-v-6bb4f510="">
+         <!--[-->
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="/help-center/oh_3481?c_id=1020">
+           Contact Us
+          </a>
+         </li>
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="https://www.kilimall.co.ke">
+           Kenya
+          </a>
+         </li>
+         <li data-v-6bb4f510="">
+          <a data-v-6bb4f510="" href="https://www.kilimall.co.ke/sitemap.html">
+           Sitemap
+          </a>
+         </li>
+         <!--]-->
+        </ul>
+       </div>
+       <!--]-->
+      </div>
+     </div>
+    </div>
+    <div data-v-6bb4f510="" style="background-color:#f7f7f7;">
+     <div class="stay-connected" data-v-6bb4f510="">
+      <p class="title-text" data-v-6bb4f510="">
+       Stay Connected:
+      </p>
+      <div class="stay-icons" data-v-6bb4f510="">
+       <a data-v-6bb4f510="" href="https://www.facebook.com/kilimall/" target="_blank">
+        <img alt="" data-v-6bb4f510="" src="https://image.kilimall.com/kenya/PcImages/footerappad/facebook.png"/>
+       </a>
+       <a data-v-6bb4f510="" href="https://twitter.com/Kilimall" target="_blank">
+        <img alt="" data-v-6bb4f510="" src="https://image.kilimall.com/kenya/PcImages/footerappad/twitter.png"/>
+       </a>
+       <a data-v-6bb4f510="" href="http://k.kili.co/11zqh" target="_blank">
+        <img alt="" data-v-6bb4f510="" src="https://image.kilimall.com/kenya/PcImages/tiktok.png"/>
+       </a>
+       <a data-v-6bb4f510="" href="http://k.kili.co/11zqk" target="_blank">
+        <img alt="" data-v-6bb4f510="" src="https://image.kilimall.com/kenya/PcImages/ins.png"/>
+       </a>
+      </div>
+      <p class="title-text download-app" data-v-6bb4f510="">
+       Download App:
+      </p>
+      <a data-v-6bb4f510="" href="https://play.google.com/store/apps/details?id=net.kilimall.shop" target="_blank">
+       <img alt="" class="google-play-icon" data-v-6bb4f510="" src="https://img.kilimall.com/c/h5/imgs/google-play-btn@2x.png"/>
+      </a>
+      <a data-v-6bb4f510="" href="https://apps.apple.com/ke/app/kilimall/id6470137287" target="_blank">
+       <img alt="" class="google-play-icon" data-v-6bb4f510="" src="https://img.kilimall.com/c/h5/imgs/app-store-btn@2x.png"/>
+      </a>
+     </div>
+     <div class="supportedPayment" data-v-6bb4f510="">
+      <div class="bannr" data-v-6bb4f510="">
+       <ul class="paymentICONLIST" data-v-6bb4f510="">
+        <li data-v-6bb4f510="">
+         <img alt="M-PESA" data-v-6bb4f510=""/>
+        </li>
+        <li data-v-6bb4f510="">
+         <img alt="Airtel" data-v-6bb4f510=""/>
+        </li>
+        <li data-v-6bb4f510="">
+         <img alt="KCB" data-v-6bb4f510=""/>
+        </li>
+        <li data-v-6bb4f510="">
+         <img alt="Ecobank" data-v-6bb4f510=""/>
+        </li>
+        <li data-v-6bb4f510="">
+         <img alt="CreditBank" data-v-6bb4f510=""/>
+        </li>
+        <li data-v-6bb4f510="">
+         <img alt="Lipapay" data-v-6bb4f510=""/>
+        </li>
+        <li data-v-6bb4f510="">
+         <img alt="Visa" data-v-6bb4f510=""/>
+        </li>
+        <li data-v-6bb4f510="">
+         <img alt="Mastercard" data-v-6bb4f510=""/>
+        </li>
+        <li data-v-6bb4f510="">
+         <img alt="UnionPay" data-v-6bb4f510=""/>
+        </li>
+        <li data-v-6bb4f510="">
+         <img alt="iPay" data-v-6bb4f510=""/>
+        </li>
+        <li data-v-6bb4f510="">
+         <img alt="McAfee SECURE" data-v-6bb4f510=""/>
+        </li>
+        <li data-v-6bb4f510="">
+         <img alt="TrustedSite" data-v-6bb4f510=""/>
+        </li>
+        <li data-v-6bb4f510="">
+         <img alt="SSL Secure" data-v-6bb4f510=""/>
+        </li>
+       </ul>
+      </div>
+     </div>
+     <div class="brand-div" data-v-6bb4f510="">
+      <div class="brand-item" data-v-6bb4f510="">
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=VITRON">
+        VITRON
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Lyons">
+        Lyons
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Volsmart">
+        Volsmart
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=IPCONE">
+        IPCONE
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Hisense">
+        Hisense
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=GLD">
+        GLD
+       </a>
+      </div>
+      <div class="brand-item" data-v-6bb4f510="">
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Artel">
+        Artel
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=ECOMAX">
+        ECOMAX
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=SONAR">
+        SONAR
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=RAMTONS">
+        RAMTONS
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=TAGWOOD">
+        TAGWOOD
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=ElectroMate">
+        ElectroMate
+       </a>
+      </div>
+      <div class="brand-item" data-v-6bb4f510="">
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Eurochef">
+        Eurochef
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=RASHNIK">
+        RASHNIK
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=EOCO">
+        EOCO
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=TCL">
+        TCL
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Haier">
+        Haier
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Euroken">
+        Euroken
+       </a>
+      </div>
+      <div class="brand-item" data-v-6bb4f510="">
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=VON">
+        VON
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=SmartPro">
+        SmartPro
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Rebune">
+        Rebune
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Garnier">
+        Garnier
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Maybelline">
+        Maybelline
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=L'oreal+Paris">
+        L'oreal Paris
+       </a>
+      </div>
+      <div class="brand-item" data-v-6bb4f510="">
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Nice%26Lovely">
+        Nice&amp;Lovely
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Versman">
+        Versman
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Nivea">
+        Nivea
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=USN">
+        USN
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Samsung">
+        Samsung
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Xiaomi">
+        Xiaomi
+       </a>
+      </div>
+      <div class="brand-item" data-v-6bb4f510="">
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Tecno">
+        Tecno
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=OPPO">
+        OPPO
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Apple">
+        Apple
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Infinix">
+        Infinix
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=itel">
+        itel
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=realme">
+        realme
+       </a>
+      </div>
+      <div class="brand-item" data-v-6bb4f510="">
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Honor">
+        Honor
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=vivo">
+        vivo
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Oraimo">
+        Oraimo
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Lenovo">
+        Lenovo
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=HP">
+        HP
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=ASUS">
+        ASUS
+       </a>
+      </div>
+      <div class="brand-item" data-v-6bb4f510="">
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=TC">
+        TC
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=JAZA+KEJA">
+        JAZA KEJA
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Jamespot">
+        Jamespot
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=SUNDABESTS">
+        SUNDABESTS
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Signature">
+        Signature
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Nice+One">
+        Nice One
+       </a>
+      </div>
+      <div class="brand-item" data-v-6bb4f510="">
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Rashnik">
+        Rashnik
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Edenberg">
+        Edenberg
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Mimi+Home">
+        Mimi Home
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Superfoam">
+        Superfoam
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Vivo+mattress">
+        Vivo mattress
+       </a>
+       <a class="brand-title" data-v-6bb4f510="" href="/search?q=Fortress+Mattress">
+        Fortress Mattress
+       </a>
+      </div>
+     </div>
+     <div class="copyright" data-v-6bb4f510="">
+      <p data-v-6bb4f510="" style="margin-bottom:5px;">
+       <a data-v-6bb4f510="" href="https://www.kilimall.co.ke/">
+        MALL
+       </a>
+       |
+       <a data-v-6bb4f510="" href="https://seller.kilimall.ke/login" target="_blank">
+        SELLER
+       </a>
+       |
+       <a data-v-6bb4f510="" href="https://play.google.com/store/apps/details?id=net.kilimall.shop">
+        MOBILE APP
+       </a>
+      </p>
+      Copyright 2025
+      <a data-v-6bb4f510="" href="https://www.kilimall.co.ke/" target="_blank">
+       Kilimall
+      </a>
+      , All rights reserved.
+     </div>
+    </div>
+   </div>
+   <!--]-->
+   <div data-auto_select="true" data-callback="googleLoginCallback" data-client_id="214923478109-ot56okp0olmetmaih8va0eo5k4pk8m47.apps.googleusercontent.com" data-context="signin" id="g_id_onload">
+   </div>
+   <span>
+   </span>
+   <!--]-->
+   <!--]-->
+  </div>
+  <div id="teleports">
+  </div>
+  <script data-ssr="true" id="__NUXT_DATA__" type="application/json">
+   [["ShallowReactive",1],{"data":2,"state":636,"once":639,"_errors":640,"serverRendered":312,"path":642},["ShallowReactive",3],{"/api/global-cache":4,"/api/home/hot-keywords":528},{"code":5,"data":6,"message":527},0,{"regions":7,"obsJsonData":31},[8],{"id":9,"code":10,"name":11,"flag":12,"currencySymbol":13,"language":14,"timeZone":15,"utcTimeOffset":16,"callingCode":17,"domain":18,"isPrimaryDomain":19,"userAddressInteractionMethod":5,"registrationConfig":20,"currency":22,"addressLevel":16,"addressNameMap":23,"addressNames":27,"orderConfig":28,"threeDigitCode":30,"vatSwitch":19},6,"KE","Kenya","https://image.kilimall.com/lite/common/country-flags/100000001.jpg","KSh","en","Africa/Nairobi",3,"254","https://www.kilimall.co.ke",false,{"registerMethods":21,"defaultMethod":5,"enableFacebook":21,"enableBinding":21},null,"KES",{"1":24,"2":25,"3":26},"County","Subcounty/Town","Area(ward)",[24,25,26],{"qtyLimit":29},30,"KEN",{"flashsale":32,"hot_categories":147,"banner_app_v2":302,"app_update":412,"seo":428,"front_categories":457},{"version":33,"data":34,"obsUrl":146},1754057932,{"session":35,"skus":40},{"id":36,"status":37,"startTime":38,"endTime":39},84676,1,"2025-08-01T13:00:00.000000Z","2025-08-01T15:00:00.000000Z",[41,48,55,61,66,73,80,85,91,95,101,107,113,119,126,132,136,141],{"index":42,"image":43,"activityPrice":44,"title":45,"listPrice":46,"skuId":47},120,"https://image.kilimall.com/kenya/shop/store/goods/3281/2023/12/1701413372175e9989b06e8744ad583a6e13ccac63744.jpg?x-image-process=image/format,webp/resize,w_360#",99,"Geneva Women Watches For Lady Wrist Watch Ladies Watches Luxury Quartz Stainless Steel Band Casual Fashion Valentine's Day Gift Sliver One SizeSliver,One Size",3000,12678473,{"index":49,"image":50,"activityPrice":51,"title":52,"listPrice":53,"skuId":54},100,"https://image.kilimall.com/kenya/shop/store/goods/5872/2022/11/1668972655287b491e78bf822489ab044f68d2d85b45b.jpg?x-image-process=image/format,webp/resize,w_360#",140,"JC 2023 New women wig African small curly short hair chemical fiber Synthetic Wigs For Women black Black 25cmBlack,25cm",899,18521798,{"index":49,"image":56,"activityPrice":57,"title":58,"listPrice":59,"skuId":60},"https://image.kilimall.com/kenya/shop/store/goods/5353/2024/02/1707553647873b12477239e7c4111b57d193c87feb81f.jpg?x-image-process=image/format,webp/resize,w_360#",244,"100ML Men Perfume Fruity Fragrance Eau De Parfum Cologne YT-1772",1049,19894123,{"index":49,"image":62,"activityPrice":63,"title":64,"listPrice":46,"skuId":65},"https://img.kilimall.com/c/obs/seller/5057/goods_image/241220231842_dd841e50f2646d09262301b5d9198138.jpg?x-image-process=image/format,webp/resize,w_360#",499,"Sneakers Running Platform Daddy Shoes Men's Shoes Casual New Breathable Mesh Surface Fashion Shoes White Green,EU43",10002079736,{"index":67,"image":68,"activityPrice":69,"title":70,"listPrice":71,"skuId":72},55,"https://img.kilimall.com/c/obs/seller/100003011/goods_image/250609101932_16b2e3a772c886b2bd27543f451f63a0.jpg?x-image-process=image/format,webp/resize,w_360#",519,"IPCONE 2L 1500W 2L Energy Efficient Electric Water Kettle Heater Jug Cordless Stainless Steel Electric Kettle 2l Kettle Kettle kitchen appliance small applicance kettle boiling water kettle household as picture,2L",1499,10002394181,{"index":74,"image":75,"activityPrice":76,"title":77,"listPrice":78,"skuId":79},50,"https://img.kilimall.com/c/obs/seller/5353/goods_image/240702102522_bd9534b378d636430dbfcaebe3108a3a.jpg?x-image-process=image/format,webp/resize,w_360#",184,"Women Purse Mini Cross-body Bag Ladies Tiny Korean Phone Bag Small Chain Bag As Picture",999,10000353687,{"index":74,"image":81,"activityPrice":82,"title":83,"listPrice":46,"skuId":84},"https://img.kilimall.com/c/obs/seller/100002885/goods_image/250801125639_cda19f0c78b64317ac4fbff6c4323636.jpg?x-image-process=image/format,webp/resize,w_360#",890,"Lenovo Bluetooth 5.4 Original True Wireless Bluetooth Earphones In-ear Intelligent Noise Reduction Music Game  Sports Earbuds  Low Latency Long Battery Life Suitable for Apple Android Smartphones Yellow",10003319031,{"index":74,"image":86,"activityPrice":87,"title":88,"listPrice":89,"skuId":90},"https://img.kilimall.com/c/obs/seller/6074/goods_image/250220174158_62730d10bf8175947e474ffd3396d608.jpg?x-image-process=image/format,webp/resize,w_360#",799,"7 In 1 Watch Straps New Smartwatch 2.2HD Amoled Circular Screen ECG Monitoring Reloj inteligente with Protective Case Black",3699,19847697,{"index":74,"image":92,"activityPrice":87,"title":93,"listPrice":71,"skuId":94},"https://img.kilimall.com/c/obs/seller/3692/goods_image/250115160141_3c921725bd06cf1b007b95fddacec2a8.jpg?x-image-process=image/format,webp/resize,w_360#","Jaza Keja 5/8 Tier Pot Pan Rack Organizer Metal Space-saving Cabinet Holder Adjustable Organizer for Pots, Pans and Lids Black,8 Layer",10002054690,{"index":74,"image":96,"activityPrice":97,"title":98,"listPrice":99,"skuId":100},"https://img.kilimall.com/c/obs/seller/100003011/goods_image/241121144845_c1f29076279feb51484523324abc1cf6.jpg?x-image-process=image/format,webp/resize,w_360#",1399,"IPCONE 7102  Double Gas Cooker Auto lgnition Double Burner Gas stove gas cooker 【hot】gas cooker/stove gas cooker cooking gas cooker burner gas cooker stainless Black,as picture",2699,10001640946,{"index":74,"image":102,"activityPrice":103,"title":104,"listPrice":105,"skuId":106},"https://img.kilimall.com/c/obs/seller/7451/goods_image/241211094056_133d48ec919eed2d438c651173ca54e7.jpg?x-image-process=image/format,webp/resize,w_360#",15959,"[Hot Deals] Samsung Galaxy A16 128GB+4GB 6.7\" Super AMOLED Display 50MP Triple Camera Android 14 Mediatek Helio G99 5000mAh 25W Type-C Charge Smart Phones phone Black,128GB+4GB",24999,10002034498,{"index":74,"image":108,"activityPrice":109,"title":110,"listPrice":111,"skuId":112},"https://img.kilimall.com/c/obs/seller/6042/goods_image/250522175021_503a3a0077c3eedb01ccdb5bb4b73d81.jpg?x-image-process=image/format,webp/resize,w_360#",5399,"Tagwood LTS-6A Trolley Speaker Porteable Portable Speaker Subwoofer Outdoor Speaker ,Bluetooth,Free Wireless Microphone a Built in Battery Woofer Woofer Black",12999,10003116897,{"index":74,"image":114,"activityPrice":115,"title":116,"listPrice":117,"skuId":118},"https://img.kilimall.com/c/obs/seller/100002882/goods_image/250711151854_f5d4dd5a350329fb2e22d42ddd4db15a.jpg?x-image-process=image/format,webp/resize,w_360#",16699,"ECOMAX 90L Single Door Refrigerator Home Improvement Energy Saving Fridge with Lock and Keys BCD-90 Silver,90L",20999,10000855562,{"index":120,"image":121,"activityPrice":122,"title":123,"listPrice":124,"skuId":125},40,"https://img.kilimall.com/c/obs/seller/100003354/goods_image/241204005840_132381978b5b5d9fb0f831b0276508f6.jpg?x-image-process=image/format,webp/resize,w_360#",699,"【HOT】VL-BS007 Bluetooth Accessories Waterproof Subwoofer Portable Bluetooth Wireless Speaker Surround Loudspeaker TF Card  Sound Box TWS USB Flash Drive Wireless Speakers bluetooth speaker portable Black 15.5*6.5CM",3999,10002911782,{"index":120,"image":127,"activityPrice":128,"title":129,"listPrice":130,"skuId":131},"https://image.kilimall.com/kenya/shop/store/goods/5890/2019/11/5890_06273466271381084.jpg?x-image-process=image/format,webp/resize,w_360#",599,"CALLA Handbags for Ladies PU Leather Large Capacity Tote Single Shoulder Bags for Women New women's bag The same bag is fashionable, versatile, fashionable bag Simple casual should black 13.4in*4.7in*black,13.4in*4.7in*11.4in",1999,13703412,{"index":120,"image":133,"activityPrice":122,"title":134,"listPrice":130,"skuId":135},"https://image.kilimall.com/kenya/shop/store/goods/5890/2022/03/164679493462430a15d4a7e4f4e949ce740956ccfbf7a.jpg?x-image-process=image/format,webp/resize,w_360#","Ladies' Shoulder Pu Generous Bag Casual Fashion Shoulder  Handbags for Women Shopping Bags New Tote bag Large capacity simple casual shoulder messenger bag Versatile commuting port Black one sizeBlack,one size",17556136,{"index":120,"image":137,"activityPrice":138,"title":139,"listPrice":130,"skuId":140},"https://img.kilimall.com/c/public/store/9445/goods/image/101466379.jpg?x-image-process=image/format,webp/resize,w_360#",759,"Women's 6.5cm Simple Slimming Slim Open-Toed One-Line Buckle Sandals With High Heels White,EU37",10000436892,{"index":120,"image":142,"activityPrice":78,"title":143,"listPrice":144,"skuId":145},"https://img.kilimall.com/c/obs/seller/5396/goods_image/241105140251_caa2ebbf95cc9accec390aadcd810279.png?x-image-process=image/format,webp/resize,w_360#","Golden Smart Watch 2.01 inch Ultra Max Bluetooth Waterproof Sports Smartwatch with Real Screw Buckle Metal Dual Band Business Luxury Watches Gold",1799,10000854238,"https://img.kilimall.com/lite/file-cache/ke/flashsale.json",{"version":148,"data":149,"obsUrl":301},1753772817,[150,156,161,166,171,176,181,186,191,196,201,206,211,216,221,226,231,236,241,246,251,256,261,265,270,275,279,284,288,293,297],{"id":151,"name":152,"iconUrl":153,"bindUrl":154,"children":155},100000447,"TVs","https://img.kilimall.com/c/common/category-icon/100001632.jpg?x-image-process=image/format,webp/resize,w_240#","",[],{"id":157,"name":158,"iconUrl":159,"bindUrl":154,"children":160},100000257,"Appliances","https://img.kilimall.com/c/common/category-icon/100001633.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":162,"name":163,"iconUrl":164,"bindUrl":154,"children":165},100000249,"Kitchen","https://img.kilimall.com/c/common/category-icon/100001631.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":167,"name":168,"iconUrl":169,"bindUrl":154,"children":170},100000258,"Home","https://img.kilimall.com/c/common/category-icon/100001628.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":172,"name":173,"iconUrl":174,"bindUrl":154,"children":175},100000290,"Phones","https://img.kilimall.com/c/common/category-icon/100001637.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":177,"name":178,"iconUrl":179,"bindUrl":154,"children":180},100000347,"Refurbished Phones","https://img.kilimall.com/c/common/category-icon/100001636.png?x-image-process=image/format,webp/resize,w_240#",[],{"id":182,"name":183,"iconUrl":184,"bindUrl":154,"children":185},4693,"Earphones","https://img.kilimall.com/c/common/category-icon/100001640.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":187,"name":188,"iconUrl":189,"bindUrl":154,"children":190},100000377,"Smartwatches","https://img.kilimall.com/c/common/category-icon/100000676.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":192,"name":193,"iconUrl":194,"bindUrl":154,"children":195},100000143,"Personal Care","https://img.kilimall.com/c/common/category-icon/100000614.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":197,"name":198,"iconUrl":199,"bindUrl":154,"children":200},100000142,"Beauty","https://img.kilimall.com/c/common/category-icon/100000537.png?x-image-process=image/format,webp/resize,w_240#",[],{"id":202,"name":203,"iconUrl":204,"bindUrl":154,"children":205},100000267,"Health Care","https://img.kilimall.com/c/common/category-icon/100001155.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":207,"name":208,"iconUrl":209,"bindUrl":154,"children":210},100000197,"Wigs and Tools","https://img.kilimall.com/c/common/category-icon/100000308.png?x-image-process=image/format,webp/resize,w_240#",[],{"id":212,"name":213,"iconUrl":214,"bindUrl":154,"children":215},100000155,"Men Shoes","https://img.kilimall.com/c/common/category-icon/100001767.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":217,"name":218,"iconUrl":219,"bindUrl":154,"children":220},100000153,"Women Shoes","https://img.kilimall.com/c/common/category-icon/100001768.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":222,"name":223,"iconUrl":224,"bindUrl":154,"children":225},100000154,"Kids Shoes","https://img.kilimall.com/c/common/category-icon/100000165.jpeg?x-image-process=image/format,webp/resize,w_240#",[],{"id":227,"name":228,"iconUrl":229,"bindUrl":154,"children":230},100000068,"Women Accessories","https://img.kilimall.com/c/common/category-icon/100001726.png?x-image-process=image/format,webp/resize,w_240#",[],{"id":232,"name":233,"iconUrl":234,"bindUrl":154,"children":235},100000069,"Men Accessories","https://img.kilimall.com/c/common/category-icon/100000487.png?x-image-process=image/format,webp/resize,w_240#",[],{"id":237,"name":238,"iconUrl":239,"bindUrl":154,"children":240},100000073,"Women Clothes","https://img.kilimall.com/c/common/category-icon/100000490.png?x-image-process=image/format,webp/resize,w_240#",[],{"id":242,"name":243,"iconUrl":244,"bindUrl":154,"children":245},100000072,"Men Clothes","https://img.kilimall.com/c/common/category-icon/100000488.png?x-image-process=image/format,webp/resize,w_240#",[],{"id":247,"name":248,"iconUrl":249,"bindUrl":154,"children":250},100000108,"Women Bags","https://img.kilimall.com/c/common/category-icon/100000615.png?x-image-process=image/format,webp/resize,w_240#",[],{"id":252,"name":253,"iconUrl":254,"bindUrl":154,"children":255},100000107,"Men Bags","https://img.kilimall.com/c/common/category-icon/100000507.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":257,"name":258,"iconUrl":259,"bindUrl":154,"children":260},100000357,"Computer","https://img.kilimall.com/c/common/category-icon/100001641.png?x-image-process=image/format,webp/resize,w_240#",[],{"id":262,"name":263,"iconUrl":21,"bindUrl":154,"children":264},100000916,"Automotive",[],{"id":266,"name":267,"iconUrl":268,"bindUrl":154,"children":269},100000458,"Fridge","https://img.kilimall.com/c/common/category-icon/100000780.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":271,"name":272,"iconUrl":273,"bindUrl":154,"children":274},100000415,"Storage Devices","https://img.kilimall.com/c/common/category-icon/100000701.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":276,"name":277,"iconUrl":154,"bindUrl":154,"children":278},100000944,"Furniture",[],{"id":280,"name":281,"iconUrl":282,"bindUrl":154,"children":283},100000099,"Kids Clothes","https://img.kilimall.com/c/common/category-icon/100000506.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":285,"name":286,"iconUrl":21,"bindUrl":154,"children":287},100000487,"Sports&Outdoors",[],{"id":289,"name":290,"iconUrl":291,"bindUrl":154,"children":292},100000274,"Toys & Games","https://img.kilimall.com/c/common/category-icon/100001156.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":294,"name":295,"iconUrl":21,"bindUrl":154,"children":296},100000922,"Kids & Baby Products",[],{"id":298,"name":299,"iconUrl":154,"bindUrl":154,"children":300},100000954,"Food",[],"https://img.kilimall.com/lite/file-cache/ke/hot_categories.json",{"version":303,"data":304,"obsUrl":411},1754017017,{"topBanner":305,"homeBanner":306,"smallBanner":377,"bgBanner":398,"newArrival":399},[],[307,317,324,330,336,342,348,353,359,365,372],{"id":308,"regionId":9,"imageUrl":309,"index":5,"configType":310,"value":311,"enabled":312,"location":313,"name":314,"startTime":315,"endTime":316,"frontCategoryId":21,"startColor":21,"endColor":21},100000222,"https://img.kilimall.com/c/public/banner-image/100010563.jpg?x-image-process=image/format,webp#",10,"10002451753",true,11,"特殊会场","2025-07-28T21:00:00.000000Z","2025-08-04T20:59:59.999000Z",{"id":318,"regionId":9,"imageUrl":319,"index":37,"configType":37,"value":320,"enabled":312,"location":313,"name":321,"startTime":322,"endTime":323,"frontCategoryId":21,"endColor":21,"startColor":21},100000063,"https://img.kilimall.com/c/public/banner-image/100010573.jpg?x-image-process=image/format,webp#","https://www.kilimall.co.ke/c/Beauty-Brand-Clearance-Sale?salesource=pc","pc横板第一张-新品","2025-07-29T21:00:00.000000Z","2025-08-06T20:59:59.999000Z",{"id":325,"regionId":9,"imageUrl":326,"index":16,"configType":37,"value":327,"enabled":312,"location":313,"name":328,"startTime":329,"endTime":316,"frontCategoryId":21,"endColor":21,"startColor":21},100000075,"https://img.kilimall.com/c/public/banner-image/100010616.jpg?x-image-process=image/format,webp#","https://www.kilimall.co.ke/c/Living-Room-Venue?salesource=pc","pc横板第三张","2025-07-13T21:00:00.000000Z",{"id":331,"regionId":9,"imageUrl":332,"index":333,"configType":37,"value":334,"enabled":312,"location":313,"name":335,"startTime":329,"endTime":316,"frontCategoryId":21,"endColor":21,"startColor":21},100000101,"https://img.kilimall.com/c/public/banner-image/100010617.jpg?x-image-process=image/format,webp#",4,"https://www.kilimall.co.ke/c/Phone-Accs-Sale?salesource=pc","pc横板第四张",{"id":337,"regionId":9,"imageUrl":338,"index":333,"configType":37,"value":339,"enabled":312,"location":313,"name":340,"startTime":341,"endTime":316,"frontCategoryId":21,"startColor":21,"endColor":21},100000223,"https://img.kilimall.com/c/public/banner-image/100010585.jpg?x-image-process=image/format,webp#","https://www.kilimall.co.ke/c/Fans-Festival-Sale-Tips?salesource=pc","特殊会场-","2025-07-30T21:00:00.000000Z",{"id":343,"regionId":9,"imageUrl":344,"index":345,"configType":37,"value":346,"enabled":312,"location":313,"name":347,"startTime":329,"endTime":316,"frontCategoryId":21,"endColor":21,"startColor":21},100000113,"https://img.kilimall.com/c/public/banner-image/100010618.jpg?x-image-process=image/format,webp#",5,"https://www.kilimall.co.ke/c/Kitchen-Sale-Home-Improvement?salesource=pc","pc横板第五张",{"id":349,"regionId":9,"imageUrl":350,"index":9,"configType":37,"value":351,"enabled":312,"location":313,"name":352,"startTime":329,"endTime":316,"frontCategoryId":21,"endColor":21,"startColor":21},100000136,"https://img.kilimall.com/c/public/banner-image/100010619.jpg?x-image-process=image/format,webp#","https://www.kilimall.co.ke/c/FashionSale?salesource=pc","pc横板第六张",{"id":354,"regionId":9,"imageUrl":355,"index":356,"configType":37,"value":357,"enabled":312,"location":313,"name":358,"startTime":329,"endTime":316,"frontCategoryId":21,"endColor":21,"startColor":21},100000138,"https://img.kilimall.com/c/public/banner-image/100010620.jpg?x-image-process=image/format,webp#",7,"https://www.kilimall.co.ke/c/Bedroom-Venue?salesource=pc","pc横板第七张",{"id":360,"regionId":9,"imageUrl":361,"index":362,"configType":37,"value":363,"enabled":312,"location":313,"name":364,"startTime":329,"endTime":316,"frontCategoryId":21,"endColor":21,"startColor":21},100000180,"https://img.kilimall.com/c/public/banner-image/100010621.jpg?x-image-process=image/format,webp#",8,"https://www.kilimall.co.ke/c/TV-Audio-Sales?salesource=pc","pc横板第八张",{"id":366,"regionId":9,"imageUrl":367,"index":368,"configType":37,"value":369,"enabled":312,"location":313,"name":370,"startTime":371,"endTime":316,"frontCategoryId":21,"endColor":21,"startColor":21},100000182,"https://img.kilimall.com/c/public/banner-image/100010301.jpg?x-image-process=image/format,webp#",9,"https://www.kilimall.co.ke/c/Appliances-Home-Brand?salesource=pc","pc横板第九张","2025-07-14T21:00:00.000000Z",{"id":373,"regionId":9,"imageUrl":374,"index":310,"configType":37,"value":375,"enabled":312,"location":313,"name":376,"startTime":371,"endTime":316,"frontCategoryId":21,"startColor":21,"endColor":21},100000221,"https://img.kilimall.com/c/public/banner-image/100010622.jpg?x-image-process=image/format,webp#","https://www.kilimall.co.ke/c/Garden-Venue?salesource=pc","pc横板第十张",[378,384,389,393],{"id":379,"regionId":9,"imageUrl":380,"index":37,"configType":310,"value":381,"enabled":312,"location":382,"name":383,"startTime":329,"endTime":316,"frontCategoryId":21,"endColor":21,"startColor":21},100000067,"https://img.kilimall.com/c/public/banner-image/100010600.jpg?x-image-process=image/format,webp#","10003590195",12,"pc samll banner-1",{"id":227,"regionId":9,"imageUrl":385,"index":386,"configType":310,"value":387,"enabled":312,"location":382,"name":388,"startTime":329,"endTime":316,"frontCategoryId":21,"endColor":21,"startColor":21},"https://img.kilimall.com/c/public/banner-image/100010602.jpg?x-image-process=image/format,webp#",2,"10001603168","pc samll banner-2",{"id":232,"regionId":9,"imageUrl":390,"index":16,"configType":310,"value":391,"enabled":312,"location":382,"name":392,"startTime":329,"endTime":316,"frontCategoryId":21,"endColor":21,"startColor":21},"https://img.kilimall.com/c/public/banner-image/100010603.jpg?x-image-process=image/format,webp#","19765084","pc下方小banner-3",{"id":394,"regionId":9,"imageUrl":395,"index":333,"configType":310,"value":396,"enabled":312,"location":382,"name":397,"startTime":329,"endTime":316,"frontCategoryId":21,"endColor":21,"startColor":21},100000070,"https://img.kilimall.com/c/public/banner-image/100010604.jpg?x-image-process=image/format,webp#","10003378039","pc下方小banner-4",[],[400,405],{"id":401,"regionId":9,"imageUrl":402,"index":5,"configType":310,"value":311,"enabled":312,"location":16,"name":403,"startTime":315,"endTime":404,"frontCategoryId":21,"endColor":21,"startColor":21},100000123,"https://img.kilimall.com/c/public/banner-image/100010562.jpg?x-image-process=image/format,webp#","New Launch","2025-08-07T20:59:59.999000Z",{"id":406,"regionId":9,"imageUrl":407,"index":5,"configType":9,"value":408,"enabled":312,"location":16,"name":403,"startTime":409,"endTime":410,"frontCategoryId":21,"endColor":21,"startColor":21},100000128,"https://img.kilimall.com/c/public/banner-image/100010453.jpg?x-image-process=image/format,webp#","100007807","2025-07-22T21:00:00.000000Z","2025-08-01T20:59:59.999000Z","https://img.kilimall.com/lite/file-cache/ke/banner_app_v2.json",{"version":413,"data":414,"obsUrl":427},1752742843,{"minVersion":415,"frequencyPerHours":416,"frequencyTimes":37,"forceUpdateVersion":417,"reminder":418,"channelUrlMap":419,"minVersionIOS":423,"frequencyPerHoursIOS":424,"frequencyTimesIOS":37,"forceUpdateVersionIOS":425,"reminderIOS":426},"564",72,"181","To ensure you continue to enjoy the latest features and improvements, we kindly request that you update the app to version 5.9.3 promptly.\n\nWhat’s New?\n1. Arrival Alerts​​ – Subscribe to get notified when out-of-stock items are back!\n​​2. Edit & Add Reviews​​ – Modify or add follow-up comments within 7 days.\n3. Smoother Voucher Use​​ – See why vouchers can’t apply on checkout.\n​​4. Cross-Store Spend page optimization – Smoother, simpler way to mix and match items across shops to hit spend & save goals!\n\nUpdate now and enjoy a better shopping experience with Kilimall! ",{"gps":420,"h5":421,"ios":422},"https://play.google.com/store/apps/details?id=net.kilimall.shop","https://img.kilimall.com/c/obs/operator/100000295/app_update/Kilimall-GPS-V5.10.0-566-release.apk","https://apps.apple.com/ke/app/kilimall/id6470137287","100",24,"0","Dear User,\nTo enhance your app experience, I suggest updating to the latest version.\n\nHere are the highlights of the Version 1.6.0 update:\n\n1. Fix known issues and improve shopping experience","https://img.kilimall.com/lite/file-cache/ke/app_update.json",{"version":429,"data":430,"obsUrl":456},1753924688,{"homepage":431,"productDetail":435,"searchResult":440,"categoryResult":444,"globalConfig":448,"productDetailVideo":452},{"title":432,"metaTitle":432,"metaDescription":433,"metaKeywords":434},"Kilimall Kenya | Online Shopping for Mobile Phones & Tablets, Electronics, Home & Living, TVs & Video, Computers & Accessories, Smartphones,Toys. Free delivery","Shop 10 Million+ Products on Kilimall: Phones, Fashion,electronics, home appliances,TVs,Accessories,& More! Kenya's No.1 E-commerce with 48-Hour Delivery. Real buying reviews","Kenya online Shopping, discount shopping, fast delivery, Black Friday,online shopping Kenya, Kilimall, free delivery Nairobi, M-PESA payment, sell online Kenya, e-commerce Africa, cheap phones Kenya\n",{"title":436,"metaTitle":437,"metaDescription":438,"metaKeywords":439},"Best price for $[productTitle]","Exclusive discounts for $[productTitle]","Discover $[productTitle] at Kilimall! Find the best deals on $[productSubCategory] with fast shipping and great customer support. Shop now and save!"," mobile phones, laptop, women’s fashion, men’s fashion, Samsung, OPPO, Vivo, Huawei, Apple, shoes, home appliance,  bags,smart tv, vitron,xiaomi,realme,LG,Artel,Tecno",{"title":441,"metaTitle":441,"metaDescription":442,"metaKeywords":443},"Unbeatable Prices on $[searchKeyword] at Kilimall - Shop Now!","Buy  $[searchKeyword]  best prices in Kenya. Get Best $[searchKeyword]  deals online from Kilimall Kenya. ","$[searchKeyword], mobile phones, laptop, fashion, fashion, Samsung, OPPO, Vivo, Apple, shoes, home appliance, Jumia, Black Friday, bags,villaon v20,best prices in Kenya",{"title":445,"metaTitle":445,"metaDescription":446,"metaKeywords":447},"Buy Top $[productSubCategory] at Kilimall - Kilimall Kenya","Get the latest $[productSubCategory] when you shop at Kilimall! Enjoy amazing prices, fast delivery, and guaranteed customer satisfaction. ","$[productSubCategory], hair dryer, hair tools, handbags, heels, ladies shoes, kitchen, mosquito net, necklace, perfume",{"title":449,"metaTitle":449,"metaDescription":450,"metaKeywords":451},"Kilimall Kenya | Affordable & Safe Online Shopping Mall.","Shop 10 Million+ Products on Kilimall: Phones, Fashion,electronics, home appliances, Groceries & More! Kenya's No.1 E-commerce with 48-Hour Delivery. Real buying reviews","online shopping Kenya, Kilimall, free delivery Nairobi, M-PESA payment, sell online Kenya, e-commerce Africa, cheap phones Kenya",{"title":453,"metaTitle":453,"metaDescription":454,"metaKeywords":455},"Explore $[productSubCategory]: $[productSubCategory] Video | Kilimall Kenya","Watch the $[productSubCategory] video and learn more about its features. Shop top $[productSubCategory] at Kilimall Kenya today.","$[productSubCategory] Video,$[productSubCategory] Reviews, Kilimall Kenya, online shopping, product review, $[productTitle] Video\n\n","https://img.kilimall.com/lite/file-cache/ke/seo.json",{"version":458,"data":459,"obsUrl":526},1753665810,[460,465,470,475,480,485,490,494,498,503,508,513,517,521],{"id":461,"name":462,"iconUrl":463,"bindUrl":154,"children":464},100000337,"Kili Featured","https://img.kilimall.com/c/common/category-icon/100000627.png?x-image-process=image/format,webp/resize,w_240#",[],{"id":466,"name":467,"iconUrl":468,"bindUrl":154,"children":469},2069,"TV,Audio&Video","https://img.kilimall.com/c/common/category-icon/100000784.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":471,"name":472,"iconUrl":473,"bindUrl":154,"children":474},968,"Shoes","https://img.kilimall.com/c/common/category-icon/100000485.png?x-image-process=image/format,webp/resize,w_240#",[],{"id":476,"name":477,"iconUrl":478,"bindUrl":154,"children":479},872,"Phones & Accessories","https://img.kilimall.com/c/common/category-icon/100000495.png?x-image-process=image/format,webp/resize,w_240#",[],{"id":481,"name":482,"iconUrl":483,"bindUrl":154,"children":484},2381,"Home & Kitchen","https://img.kilimall.com/c/common/category-icon/100000760.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":486,"name":487,"iconUrl":488,"bindUrl":154,"children":489},482,"Health & Beauty","https://img.kilimall.com/c/common/category-icon/100000494.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":491,"name":158,"iconUrl":492,"bindUrl":154,"children":493},100000359,"https://img.kilimall.com/c/common/category-icon/100000668.png?x-image-process=image/format,webp/resize,w_240#",[],{"id":37,"name":495,"iconUrl":496,"bindUrl":154,"children":497},"Bags","https://img.kilimall.com/c/common/category-icon/100000010.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":499,"name":500,"iconUrl":501,"bindUrl":154,"children":502},167,"Clothes","https://img.kilimall.com/c/common/category-icon/100000492.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":504,"name":505,"iconUrl":506,"bindUrl":154,"children":507},38,"Watches & Jewellery","https://img.kilimall.com/c/common/category-icon/100000491.png?x-image-process=image/format,webp/resize,w_240#",[],{"id":509,"name":510,"iconUrl":511,"bindUrl":154,"children":512},349,"Computers & Accessories","https://img.kilimall.com/c/common/category-icon/100000493.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":514,"name":295,"iconUrl":515,"bindUrl":154,"children":516},1211,"https://img.kilimall.com/c/common/category-icon/100000497.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":518,"name":263,"iconUrl":519,"bindUrl":154,"children":520},100000592,"https://img.kilimall.com/c/common/category-icon/100000985.jpg?x-image-process=image/format,webp/resize,w_240#",[],{"id":522,"name":523,"iconUrl":524,"bindUrl":154,"children":525},100000462,"Others","https://img.kilimall.com/c/common/category-icon/100000785.png?x-image-process=image/format,webp/resize,w_240#",[],"https://img.kilimall.com/lite/file-cache/ke/front_categories.json","success",{"code":5,"data":529,"message":527},{"hotKeywords":530},[531,536,540,545,550,554,557,562,566,571,576,580,584,588,592,598,604,610,613,615,617,619,621,623,625,627,629,631,632,634],{"backgroundColor":154,"fontColor":154,"id":532,"index":37,"keyword":533,"linkType":345,"linkValue":534,"remark":535},100000217,"Tecno Spark 40","1001347735","45W SuperCharging",{"backgroundColor":154,"fontColor":154,"id":537,"index":37,"keyword":538,"linkType":386,"linkValue":538,"remark":539},100000201,"Hisense","Official Authentic",{"backgroundColor":154,"fontColor":154,"id":541,"index":386,"keyword":542,"linkType":386,"linkValue":543,"remark":544},100000202,"Maybelline lipstick","maybelline lipstick","KSh1549 get 2pcs",{"backgroundColor":154,"fontColor":154,"id":546,"index":16,"keyword":547,"linkType":345,"linkValue":548,"remark":549},100000216,"Air Pro 3 earpods","2467681","4 Hours Playtime",{"backgroundColor":154,"fontColor":154,"id":551,"index":16,"keyword":552,"linkType":386,"linkValue":552,"remark":553},100000203,"Smart TV","Up to 30% off",{"backgroundColor":154,"fontColor":154,"id":555,"index":333,"keyword":556,"linkType":386,"linkValue":556,"remark":403},100000204,"Woofer",{"backgroundColor":154,"fontColor":154,"id":558,"index":345,"keyword":559,"linkType":386,"linkValue":560,"remark":561},100000205,"Tecno","tecno","spark 40 launch",{"backgroundColor":154,"fontColor":154,"id":563,"index":9,"keyword":564,"linkType":386,"linkValue":564,"remark":565},100000206,"Men shoes","Up to 60% off",{"backgroundColor":154,"fontColor":154,"id":567,"index":356,"keyword":568,"linkType":386,"linkValue":569,"remark":570},100000207,"Infinix","infinix","new launch",{"backgroundColor":154,"fontColor":154,"id":572,"index":362,"keyword":573,"linkType":386,"linkValue":574,"remark":575},100000208,"Cookware","cookware","up to 50% off",{"backgroundColor":154,"fontColor":154,"id":577,"index":368,"keyword":578,"linkType":386,"linkValue":579,"remark":565},100000209,"Handbags","handbags",{"backgroundColor":154,"fontColor":154,"id":581,"index":310,"keyword":582,"linkType":386,"linkValue":582,"remark":583},100000210,"Panties","Up to 50% off",{"backgroundColor":154,"fontColor":154,"id":585,"index":313,"keyword":586,"linkType":386,"linkValue":587,"remark":565},100000211,"Watches set","watches set",{"backgroundColor":154,"fontColor":154,"id":589,"index":382,"keyword":590,"linkType":386,"linkValue":591,"remark":583},100000212,"Lenovo laptop","lenovo laptop",{"backgroundColor":154,"fontColor":154,"id":593,"index":594,"keyword":595,"linkType":386,"linkValue":596,"remark":597},100000213,13,"Tablet","tablet","Down to KSh199",{"backgroundColor":154,"fontColor":154,"id":599,"index":600,"keyword":601,"linkType":386,"linkValue":602,"remark":603},100000214,14,"Refurbished oppo","refurbished oppo","clearance sale",{"backgroundColor":154,"fontColor":154,"id":605,"index":606,"keyword":607,"linkType":386,"linkValue":608,"remark":609},100000215,15,"Blow dryer hair dryer","blow dryer hair dryer","Down to KSh899",{"backgroundColor":21,"fontColor":21,"id":5,"index":611,"keyword":612,"linkType":386,"linkValue":612,"remark":21},-1,"earphone",{"backgroundColor":21,"fontColor":21,"id":5,"index":611,"keyword":614,"linkType":386,"linkValue":614,"remark":21},"refurbished phone",{"backgroundColor":21,"fontColor":21,"id":5,"index":611,"keyword":616,"linkType":386,"linkValue":616,"remark":21},"phone",{"backgroundColor":21,"fontColor":21,"id":5,"index":611,"keyword":618,"linkType":386,"linkValue":618,"remark":21},"shoe",{"backgroundColor":21,"fontColor":21,"id":5,"index":611,"keyword":620,"linkType":386,"linkValue":620,"remark":21},"woofer",{"backgroundColor":21,"fontColor":21,"id":5,"index":611,"keyword":622,"linkType":386,"linkValue":622,"remark":21},"smart tv",{"backgroundColor":21,"fontColor":21,"id":5,"index":611,"keyword":624,"linkType":386,"linkValue":624,"remark":21},"fridge",{"backgroundColor":21,"fontColor":21,"id":5,"index":611,"keyword":626,"linkType":386,"linkValue":626,"remark":21},"earpods",{"backgroundColor":21,"fontColor":21,"id":5,"index":611,"keyword":628,"linkType":386,"linkValue":628,"remark":21},"iphone",{"backgroundColor":21,"fontColor":21,"id":5,"index":611,"keyword":630,"linkType":386,"linkValue":630,"remark":21},"oppo",{"backgroundColor":21,"fontColor":21,"id":5,"index":611,"keyword":560,"linkType":386,"linkValue":560,"remark":21},{"backgroundColor":21,"fontColor":21,"id":5,"index":611,"keyword":633,"linkType":386,"linkValue":633,"remark":21},"tv",{"backgroundColor":21,"fontColor":21,"id":5,"index":611,"keyword":635,"linkType":386,"linkValue":635,"remark":21},"samsung",["Reactive",637],{"$simg1px-base64":638,"$suserInfo":-1,"$sglobal-json-data":31,"$scountryId":9,"$scountrys":7,"$srequest-loading":19,"$sis_mobile":19,"$sis_webp":19,"$srouter-loading":312,"$sshoping_cart_total":5,"$smessage_not_read_total":5},"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",["Set"],["ShallowReactive",641],{"/api/global-cache":21,"/api/home/hot-keywords":21},"/404"]
+  </script>
+  <script>
+   window.__NUXT__={};window.__NUXT__.config={public:{googleClientId:"214923478109-ot56okp0olmetmaih8va0eo5k4pk8m47.apps.googleusercontent.com",GOOGLE_GTAG_ID:"AW-965268020",fbAppId:"951665321609204",MERCHANT_ID:"LP1652932882829",RUN_NODE_ENV:"PRODUCTION",nuxtSocketIO:{sockets:[{name:"message",url:"https://chat-api.kilimall.ke"}]}},app:{baseURL:"/",buildId:"d44349d9-ddb9-4151-aa8a-61ae48803f16",buildAssetsDir:"/_nuxt/2025073010",cdnURL:"https://img.kilimall.com/c/h5/"}}
+  </script>
+ </body>
+</html>

@@ -27,11 +27,11 @@ def test_real_scraping():
     
     # Test queries - real products available in Kenya
     test_queries = [
-        "Samsung Galaxy A54",
-        "iPhone 13",
-        "MacBook Air",
-        "HP Laptop",
-        "Tecno Spark"
+        "Tecno Spark 10",
+        "Tecno Camon 20",
+        "Samsung Galaxy A14",
+        "Infinix Hot 30",
+        "Xiaomi Redmi 12"
     ]
     
     print("\n📊 SCRAPER STATUS CHECK")

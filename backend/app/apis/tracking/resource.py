@@ -35,67 +35,70 @@ def get_tracked_products(user_id):
         return jsonify({'error': str(e)}), 500
 
 
-@tracking.route('/<user_id>/products/<int:product_id>', methods=['POST'])
+@tracking.route('/<user_id>/products/<product_id>', methods=['POST'])
 def add_tracked_product(user_id, product_id):
     """
     Add a product to user's tracking list
+    Supports both integer IDs (database products) and string IDs (scraped products)
     """
     try:
         data = get_request_data(request)
-        
+
         target_price = data.get('target_price')
         notes = data.get('notes')
         alert_threshold_percent = data.get('alert_threshold_percent', 10.0)
-        
+
         # Validate alert threshold
         if not (0 <= alert_threshold_percent <= 100):
             return jsonify({'error': 'Alert threshold must be between 0 and 100'}), 400
-        
+
         result = ProductTrackingService.add_tracked_product(
             user_id=user_id,
-            product_id=product_id,
+            product_id=product_id,  # Can be int or string
             target_price=target_price,
             notes=notes,
             alert_threshold_percent=alert_threshold_percent
         )
-        
+
         return jsonify(result), 201
-        
+
     except Exception as e:
         logger.error(f"Error adding tracked product: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 
-@tracking.route('/<user_id>/products/<int:product_id>', methods=['GET'])
+@tracking.route('/<user_id>/products/<product_id>', methods=['GET'])
 def get_tracked_product_details(user_id, product_id):
     """
     Get detailed information about a tracked product
+    Supports both integer IDs (database products) and string IDs (scraped products)
     """
     try:
         result = ProductTrackingService.get_tracked_product_details(user_id, product_id)
         return jsonify(result), 200
-        
+
     except Exception as e:
         logger.error(f"Error getting tracked product details: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 
-@tracking.route('/<user_id>/products/<int:product_id>', methods=['PUT'])
+@tracking.route('/<user_id>/products/<product_id>', methods=['PUT'])
 def update_tracked_product(user_id, product_id):
     """
     Update tracking settings for a product
+    Supports both integer IDs (database products) and string IDs (scraped products)
     """
     try:
         data = get_request_data(request)
-        
+
         target_price = data.get('target_price')
         notes = data.get('notes')
         alert_threshold_percent = data.get('alert_threshold_percent')
-        
+
         # Validate alert threshold if provided
         if alert_threshold_percent is not None and not (0 <= alert_threshold_percent <= 100):
             return jsonify({'error': 'Alert threshold must be between 0 and 100'}), 400
-        
+
         result = ProductTrackingService.update_tracked_product(
             user_id=user_id,
             product_id=product_id,
@@ -103,23 +106,24 @@ def update_tracked_product(user_id, product_id):
             notes=notes,
             alert_threshold_percent=alert_threshold_percent
         )
-        
+
         return jsonify(result), 200
-        
+
     except Exception as e:
         logger.error(f"Error updating tracked product: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 
-@tracking.route('/<user_id>/products/<int:product_id>', methods=['DELETE'])
+@tracking.route('/<user_id>/products/<product_id>', methods=['DELETE'])
 def remove_tracked_product(user_id, product_id):
     """
     Remove a product from user's tracking list
+    Supports both integer IDs (database products) and string IDs (scraped products)
     """
     try:
         result = ProductTrackingService.remove_tracked_product(user_id, product_id)
         return jsonify(result), 200
-        
+
     except Exception as e:
         logger.error(f"Error removing tracked product: {str(e)}")
         return jsonify({'error': str(e)}), 500
