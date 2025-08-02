@@ -18,6 +18,120 @@ _scraped_products_cache = {}
 _cache_expiry_time = 3600  # 1 hour in seconds
 
 
+def _is_relevant_product(product_name: str, search_product_name: str, brand: str = None) -> bool:
+    """
+    Check if a scraped product is relevant to the search query
+
+    Args:
+        product_name: Name of the scraped product
+        search_product_name: Original product name being searched
+        brand: Brand name (optional)
+
+    Returns:
+        bool: True if product is relevant, False otherwise
+    """
+    if not product_name or not search_product_name:
+        return False
+
+    # Convert to lowercase for comparison
+    product_lower = product_name.lower()
+    search_lower = search_product_name.lower()
+
+    # Exclusion terms that indicate accessories or irrelevant products
+    exclusion_terms = [
+        'cover', 'case', 'screen protector', 'protector', 'tempered glass',
+        'charger', 'cable', 'adapter', 'power bank', 'holder', 'stand',
+        'pouch', 'sleeve', 'bag', 'wallet', 'flip cover', 'back cover',
+        'bumper', 'skin', 'sticker', 'ring', 'mount', 'bracket',
+        'earphone', 'headphone', 'speaker', 'bluetooth', 'wireless',
+        'memory card', 'sd card', 'usb', 'otg', 'stylus', 'pen'
+    ]
+
+    # Check if product name contains any exclusion terms
+    for term in exclusion_terms:
+        if term in product_lower:
+            return False
+
+    # Extract key words from search product name
+    search_words = search_lower.split()
+    product_words = product_lower.split()
+
+    # If brand is specified, it should be present in the product name
+    if brand:
+        brand_lower = brand.lower()
+        if brand_lower not in product_lower:
+            return False
+
+    # Check if main product words are present
+    # At least 60% of search words should be in product name
+    matching_words = 0
+    for word in search_words:
+        if len(word) > 2:  # Skip very short words
+            if word in product_lower:
+                matching_words += 1
+
+    # Calculate match percentage
+    significant_words = [w for w in search_words if len(w) > 2]
+    if not significant_words:
+        return False
+
+    match_percentage = matching_words / len(significant_words)
+
+    # Require at least 60% match for relevance
+    return match_percentage >= 0.6
+
+
+def _calculate_relevance_score(product_name: str, search_product_name: str, brand: str = None) -> float:
+    """
+    Calculate relevance score for a product
+
+    Args:
+        product_name: Name of the scraped product
+        search_product_name: Original product name being searched
+        brand: Brand name (optional)
+
+    Returns:
+        float: Relevance score between 0 and 1
+    """
+    if not product_name or not search_product_name:
+        return 0.0
+
+    product_lower = product_name.lower()
+    search_lower = search_product_name.lower()
+
+    # Start with base score
+    score = 0.0
+
+    # Exact match gets highest score
+    if product_lower == search_lower:
+        return 1.0
+
+    # Check word matches
+    search_words = set(search_lower.split())
+    product_words = set(product_lower.split())
+
+    # Calculate word overlap
+    common_words = search_words.intersection(product_words)
+    if search_words:
+        word_score = len(common_words) / len(search_words)
+        score += word_score * 0.7
+
+    # Brand match bonus
+    if brand:
+        brand_lower = brand.lower()
+        if brand_lower in product_lower:
+            score += 0.2
+
+    # Length similarity bonus (prefer similar length products)
+    length_diff = abs(len(product_lower) - len(search_lower))
+    max_length = max(len(product_lower), len(search_lower))
+    if max_length > 0:
+        length_score = 1 - (length_diff / max_length)
+        score += length_score * 0.1
+
+    return min(score, 1.0)
+
+
 class ProductService:
     """
     Service for product search and discovery
@@ -258,6 +372,152 @@ class ProductService:
         except Exception as e:
             logger.error(f"Error getting product details: {str(e)}")
             abort(500, description="Internal server error")
+
+    @classmethod
+    def get_price_comparison(cls, product_name: str, brand: str = None, limit: int = 10) -> Dict[str, Any]:
+        """
+        Get real-time price comparison for a product across multiple retailers
+
+        Args:
+            product_name: Name of the product to compare
+            brand: Brand of the product (optional)
+            limit: Maximum number of results per retailer
+
+        Returns:
+            Dict containing price comparison data from multiple retailers
+        """
+        try:
+            from app.scrapers.scraper_manager import ScraperManager
+
+            # Create search query with better specificity
+            search_query = product_name
+            if brand:
+                # Check if brand is already in product name to avoid duplication
+                if brand.lower() not in product_name.lower():
+                    search_query = f"{brand} {product_name}"
+
+            # Add exclusion terms to avoid accessories
+            exclusion_terms = ['cover', 'case', 'screen protector', 'charger', 'cable', 'adapter', 'holder', 'stand', 'pouch', 'sleeve']
+
+            logger.info(f"Getting price comparison for: {search_query}")
+
+            # Initialize scraper manager
+            scraper_manager = ScraperManager()
+
+            # Get results from all retailers
+            comparison_results = {
+                'product_name': product_name,
+                'brand': brand,
+                'search_query': search_query,
+                'retailers': {},
+                'summary': {
+                    'total_results': 0,
+                    'min_price': None,
+                    'max_price': None,
+                    'avg_price': None,
+                    'retailers_count': 0
+                },
+                'last_updated': datetime.now().isoformat()
+            }
+
+            # Search all retailers at once
+            logger.info(f"Searching all retailers for: {search_query}")
+            search_results = scraper_manager.search_all_retailers(
+                query=search_query,
+                max_pages_per_retailer=1,
+                max_workers=3
+            )
+
+            all_prices = []
+
+            # Process results from each retailer
+            for retailer, products in search_results.items():
+                try:
+                    logger.info(f"Processing {len(products)} products from {retailer}")
+
+                    # Format products for comparison with relevance filtering
+                    formatted_products = []
+                    product_scores = []
+
+                    for product in products:
+                        product_name_scraped = product.get('name', '')
+                        price = product.get('price', 0)
+
+                        # Skip products without price or name
+                        if not price or price <= 0 or not product_name_scraped:
+                            continue
+
+                        # Check if product is relevant to search query
+                        if not _is_relevant_product(product_name_scraped, product_name, brand):
+                            logger.debug(f"Skipping irrelevant product: {product_name_scraped}")
+                            continue
+
+                        # Calculate relevance score
+                        relevance_score = _calculate_relevance_score(product_name_scraped, product_name, brand)
+
+                        formatted_product = {
+                            'product_id': product.get('id', ''),
+                            'name': product_name_scraped,
+                            'brand': product.get('brand', ''),
+                            'image_url': product.get('image_url', ''),
+                            'description': product.get('description', ''),
+                            'current_price': price,
+                            'original_price': product.get('original_price'),
+                            'currency_code': product.get('currency', 'KES'),
+                            'retailer_product_url': product.get('url', ''),
+                            'in_stock': product.get('in_stock', True),
+                            'retailer_name': retailer.title(),
+                            'last_updated': datetime.now().isoformat(),
+                            'relevance_score': relevance_score
+                        }
+
+                        product_scores.append((formatted_product, relevance_score))
+
+                    # Sort by relevance score (highest first) and take top results
+                    product_scores.sort(key=lambda x: x[1], reverse=True)
+                    formatted_products = [product for product, score in product_scores[:limit]]
+
+                    # Add prices to overall list
+                    for product in formatted_products:
+                        all_prices.append(product['current_price'])
+
+                    comparison_results['retailers'][retailer] = {
+                        'name': retailer.title(),
+                        'products': formatted_products,
+                        'count': len(formatted_products),
+                        'status': 'success' if formatted_products else 'no_results',
+                        'total_scraped': len(products),
+                        'filtered_count': len(products) - len(formatted_products)
+                    }
+
+                    logger.info(f"Found {len(formatted_products)} relevant products from {retailer} (filtered {len(products) - len(formatted_products)} irrelevant items)")
+
+                except Exception as retailer_error:
+                    logger.error(f"Error processing {retailer}: {str(retailer_error)}")
+                    comparison_results['retailers'][retailer] = {
+                        'name': retailer.title(),
+                        'products': [],
+                        'count': 0,
+                        'status': 'error',
+                        'error': str(retailer_error)
+                    }
+
+            # Calculate summary statistics
+            if all_prices:
+                comparison_results['summary'] = {
+                    'total_results': len(all_prices),
+                    'min_price': min(all_prices),
+                    'max_price': max(all_prices),
+                    'avg_price': sum(all_prices) / len(all_prices),
+                    'retailers_count': len([r for r in comparison_results['retailers'].values() if r['count'] > 0])
+                }
+
+            logger.info(f"Price comparison completed. Found {len(all_prices)} total results")
+            return comparison_results
+
+        except Exception as e:
+            logger.error(f"Error getting price comparison: {str(e)}")
+            abort(500, description="Failed to get price comparison")
 
     @classmethod
     def get_scraped_product_details(cls, product_id: str) -> Dict[str, Any]:

@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
-import { productUtils } from '../../services/products';
+import React, { useState, useEffect } from 'react';
+import { productService, productUtils } from '../../services/products';
 import { Button } from '../ui/button';
+import LoadingSpinner from '../common/LoadingSpinner';
+import { ExternalLink } from 'lucide-react';
+import { useToast } from '../../context/ToastContext';
 
-const PriceComparison = ({ retailers }) => {
+const PriceComparison = ({ retailers, product, enableRealTimeComparison = false }) => {
+  const { showToast } = useToast();
   const [sortBy, setSortBy] = useState('price'); // 'price', 'retailer', 'stock'
+  const [realTimeData, setRealTimeData] = useState(null);
+  const [loadingComparison, setLoadingComparison] = useState(false);
+  const [showRealTimeComparison, setShowRealTimeComparison] = useState(false);
 
   const formatPrice = (price) => {
     return productUtils.formatPrice(price, 'KES');
@@ -35,6 +42,46 @@ const PriceComparison = ({ retailers }) => {
   const bestPrice = productUtils.getLowestPrice(retailers);
   const worstPrice = productUtils.getHighestPrice(retailers);
 
+  // Load real-time price comparison
+  const loadRealTimeComparison = async () => {
+    if (!product?.name) return;
+
+    setLoadingComparison(true);
+    try {
+      const comparisonData = await productService.getPriceComparison(
+        product.name,
+        product.brand,
+        10
+      );
+      setRealTimeData(comparisonData);
+      setShowRealTimeComparison(true);
+    } catch (error) {
+      console.error('Error loading real-time price comparison:', error);
+    } finally {
+      setLoadingComparison(false);
+    }
+  };
+
+  // Get all products from real-time data for display
+  const getRealTimeProducts = () => {
+    if (!realTimeData?.retailers) return [];
+
+    const allProducts = [];
+    Object.values(realTimeData.retailers).forEach(retailer => {
+      if (retailer.products) {
+        allProducts.push(...retailer.products);
+      }
+    });
+
+    return allProducts.sort((a, b) => {
+      if (a.in_stock && !b.in_stock) return -1;
+      if (!a.in_stock && b.in_stock) return 1;
+      return a.current_price - b.current_price;
+    });
+  };
+
+  const realTimeProducts = getRealTimeProducts();
+
   if (!retailers || retailers.length === 0) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
@@ -61,12 +108,34 @@ const PriceComparison = ({ retailers }) => {
               Price Comparison
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Compare prices across {retailers.length} retailers
+              {showRealTimeComparison
+                ? `Real-time comparison across ${Object.keys(realTimeData?.retailers || {}).length} retailers`
+                : `Compare prices across ${retailers.length} retailers`
+              }
             </p>
           </div>
-          
-          {/* Sort Options */}
-          <div className="mt-4 sm:mt-0">
+
+          <div className="mt-4 sm:mt-0 flex items-center space-x-3">
+            {/* Real-time Comparison Button */}
+            {enableRealTimeComparison && product && (
+              <Button
+                onClick={loadRealTimeComparison}
+                disabled={loadingComparison}
+                variant="outline"
+                size="sm"
+              >
+                {loadingComparison ? (
+                  <div className="flex items-center">
+                    <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Loading...
+                  </div>
+                ) : (
+                  showRealTimeComparison ? 'Refresh Prices' : 'Compare Live Prices'
+                )}
+              </Button>
+            )}
+
+            {/* Sort Options */}
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
@@ -80,7 +149,34 @@ const PriceComparison = ({ retailers }) => {
         </div>
 
         {/* Price Summary */}
-        {bestPrice && worstPrice && (
+        {showRealTimeComparison && realTimeData?.summary ? (
+          <div className="mt-4 grid grid-cols-3 gap-4">
+            <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <div className="text-sm text-green-600 dark:text-green-400 font-medium">
+                Best Price
+              </div>
+              <div className="text-lg font-bold text-green-600 dark:text-green-400">
+                {formatPrice(realTimeData.summary.min_price)}
+              </div>
+            </div>
+            <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <div className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                Average Price
+              </div>
+              <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                {formatPrice(realTimeData.summary.avg_price)}
+              </div>
+            </div>
+            <div className="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+              <div className="text-sm text-red-600 dark:text-red-400 font-medium">
+                Highest Price
+              </div>
+              <div className="text-lg font-bold text-red-600 dark:text-red-400">
+                {formatPrice(realTimeData.summary.max_price)}
+              </div>
+            </div>
+          </div>
+        ) : bestPrice && worstPrice && (
           <div className="mt-4 grid grid-cols-2 gap-4">
             <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
               <div className="text-sm text-green-600 dark:text-green-400 font-medium">
@@ -104,9 +200,124 @@ const PriceComparison = ({ retailers }) => {
 
       {/* Retailers List */}
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
-        {sortedRetailers.map((retailer, index) => {
-          const isBestPrice = retailer.in_stock && retailer.current_price === bestPrice;
-          const savings = worstPrice && retailer.in_stock ? worstPrice - retailer.current_price : 0;
+        {showRealTimeComparison && realTimeProducts.length > 0 ? (
+          // Show real-time comparison results
+          realTimeProducts.map((product, index) => {
+            const isBestPrice = product.in_stock && product.current_price === realTimeData.summary.min_price;
+            const savings = realTimeData.summary.max_price && product.in_stock ?
+              realTimeData.summary.max_price - product.current_price : 0;
+
+            return (
+              <div
+                key={`${product.retailer_name}-${index}`}
+                className={`p-6 ${isBestPrice ? 'bg-green-50 dark:bg-green-900/10' : ''}`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3">
+                      {product.image_url && (
+                        <img
+                          src={product.image_url}
+                          alt={product.name}
+                          className="w-12 h-12 object-cover rounded-lg"
+                        />
+                      )}
+                      <div>
+                        <h4 className="font-medium text-gray-900 dark:text-white">
+                          {product.retailer_name}
+                        </h4>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                          {product.name}
+                        </p>
+                        {product.brand && (
+                          <p className="text-xs text-gray-400 dark:text-gray-500">
+                            Brand: {product.brand}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <div className="flex items-center space-x-2">
+                      <div>
+                        <div className={`text-lg font-bold ${
+                          isBestPrice
+                            ? 'text-green-600 dark:text-green-400'
+                            : 'text-gray-900 dark:text-white'
+                        }`}>
+                          {formatPrice(product.current_price)}
+                        </div>
+                        {product.original_price && product.original_price > product.current_price && (
+                          <div className="text-sm text-gray-500 dark:text-gray-400 line-through">
+                            {formatPrice(product.original_price)}
+                          </div>
+                        )}
+                        {savings > 0 && (
+                          <div className="text-xs text-green-600 dark:text-green-400">
+                            Save {formatPrice(savings)}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex flex-col items-end space-y-2">
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          product.in_stock
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'
+                            : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'
+                        }`}>
+                          {product.in_stock ? 'In Stock' : 'Out of Stock'}
+                        </span>
+
+                        {isBestPrice && (
+                          <span className="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded-full">
+                            Best Price
+                          </span>
+                        )}
+
+                        {product.retailer_product_url && (
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              console.log(`Opening ${product.retailer_name} product:`, product.retailer_product_url);
+                              window.open(product.retailer_product_url, '_blank', 'noopener,noreferrer');
+                              showToast(`Opening product on ${product.retailer_name}`, 'success');
+                            }}
+                            disabled={!product.in_stock}
+                            className="bg-primary text-primary-foreground hover:bg-primary/90"
+                          >
+                            <span className="flex items-center gap-1">
+                              View on {product.retailer_name}
+                              <ExternalLink size={14} />
+                            </span>
+                          </Button>
+                        )}
+
+                        {!product.retailer_product_url && product.in_stock && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled
+                          >
+                            Link Unavailable
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+                      Updated: {formatDate(product.last_updated)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          // Show existing database retailers
+          sortedRetailers.map((retailer, index) => {
+            const isBestPrice = retailer.in_stock && retailer.current_price === bestPrice;
+            const savings = worstPrice && retailer.in_stock ? worstPrice - retailer.current_price : 0;
           
           return (
             <div
@@ -178,21 +389,38 @@ const PriceComparison = ({ retailers }) => {
 
                   {retailer.in_stock && retailer.product_url && (
                     <Button
-                      variant="outline"
                       size="sm"
-                      onClick={() => window.open(retailer.product_url, '_blank')}
-                      className="min-w-[100px]"
+                      onClick={() => {
+                        console.log(`Opening ${retailer.retailer_name} product:`, retailer.product_url);
+                        window.open(retailer.product_url, '_blank', 'noopener,noreferrer');
+                        showToast(`Opening product on ${retailer.retailer_name}`, 'success');
+                      }}
+                      className="min-w-[120px] bg-primary text-primary-foreground hover:bg-primary/90"
                     >
-                      View Deal
+                      <span className="flex items-center gap-1">
+                        View on {retailer.retailer_name}
+                        <ExternalLink size={14} />
+                      </span>
                     </Button>
                   )}
-                  
+
+                  {retailer.in_stock && !retailer.product_url && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled
+                      className="min-w-[120px]"
+                    >
+                      Link Unavailable
+                    </Button>
+                  )}
+
                   {!retailer.in_stock && (
                     <Button
                       variant="outline"
                       size="sm"
                       disabled
-                      className="min-w-[100px]"
+                      className="min-w-[120px]"
                     >
                       Out of Stock
                     </Button>
@@ -201,7 +429,7 @@ const PriceComparison = ({ retailers }) => {
               </div>
             </div>
           );
-        })}
+        }))}
       </div>
 
       {/* Footer */}

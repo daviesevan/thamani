@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import Home from './pages/Home';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
@@ -15,6 +15,14 @@ import ProductDetail from './pages/ProductDetail';
 import TrackedProducts from './pages/TrackedProducts';
 import Wishlist from './pages/Wishlist';
 import DashboardLayout from './components/dashboard/DashboardLayout';
+
+/**
+ * Redirect component for product detail pages
+ */
+const ProductDetailRedirect = () => {
+  const { productId } = useParams();
+  return <Navigate to={`/dashboard/products/${productId}`} replace />;
+};
 
 /**
  * Application routes configuration
@@ -66,10 +74,10 @@ const routes = [
     element: <Navigate to="/dashboard/search" replace />,
     exact: true,
   },
-  // Product detail route (standalone)
+  // Redirect old product detail route to dashboard product detail
   {
     path: '/products/:productId',
-    element: <ProductDetail />,
+    element: <ProductDetailRedirect />,
     exact: true,
   },
   // Dashboard routes
@@ -111,6 +119,11 @@ const routes = [
       {
         path: 'settings',
         element: <Settings />,
+        exact: true,
+      },
+      {
+        path: 'products/:productId',
+        element: <ProductDetail />,
         exact: true,
       },
     ],

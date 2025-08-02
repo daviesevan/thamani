@@ -108,6 +108,33 @@ def get_product_details(product_id):
         return jsonify({'error': str(e)}), 500
 
 
+@products.route('/compare-prices', methods=['POST'])
+def compare_prices():
+    """
+    Get real-time price comparison for a product across multiple retailers
+    """
+    try:
+        data = get_request_data(request)
+        product_name = data.get('product_name')
+        brand = data.get('brand')
+        limit = data.get('limit', 10)
+
+        if not product_name:
+            return jsonify({'error': 'Product name is required'}), 400
+
+        result = ProductService.get_price_comparison(
+            product_name=product_name,
+            brand=brand,
+            limit=limit
+        )
+
+        return jsonify(result), 200
+
+    except Exception as e:
+        logger.error(f"Error comparing prices: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
 @products.route('/categories', methods=['GET'])
 def get_categories():
     """

@@ -20,7 +20,7 @@ class JumiaScraper:
     def __init__(self):
         self.base_url = "https://www.jumia.co.ke"
         self.session = requests.Session()
-        
+
         # Realistic headers to avoid detection
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -36,6 +36,13 @@ class JumiaScraper:
             'Cache-Control': 'max-age=0'
         }
         self.session.headers.update(self.headers)
+
+        # Set cookies to bypass consent page
+        self.session.cookies.update({
+            'cookie_consent': 'accepted',
+            'jumia_consent': '1',
+            '_gcl_au': '1.1.1234567890.1234567890'
+        })
     
     def search_products(self, query: str, max_pages: int = 3) -> List[Dict[str, Any]]:
         """
@@ -88,23 +95,33 @@ class JumiaScraper:
         """
         products = []
         
-        # Jumia product containers - multiple selectors for robustness
+        # Check if we hit a cookie consent page
+        if soup.select('.cookie-consent, [class*="cookie"], [class*="consent"]'):
+            logger.warning("Hit cookie consent page, trying to continue...")
+
+        # Updated selectors for current Jumia structure (2024)
         product_selectors = [
             'article[data-catalog-id]',  # Main product articles
+            '.prd._fb.col.c-prd',  # Updated product class
             '.prd',  # Product class
             '[data-id]',  # Products with data-id
-            '.core'  # Core product container
+            '.core',  # Core product container
+            'article.prd',  # Article with prd class
+            '.itm'  # Item class
         ]
-        
+
         product_elements = []
         for selector in product_selectors:
             elements = soup.select(selector)
             if elements:
                 product_elements = elements
+                logger.info(f"Found {len(elements)} products using selector: {selector}")
                 break
-        
+
         if not product_elements:
-            logger.warning("No product elements found with any selector")
+            logger.warning(f"No products found on page: {page_url}")
+            # Debug: log page structure
+            logger.debug(f"Page title: {soup.title.string if soup.title else 'No title'}")
             return products
         
         for element in product_elements:
@@ -123,25 +140,77 @@ class JumiaScraper:
         Extract data from a single product element
         """
         try:
-            # Product name
+            # Product name and link - updated selectors for 2024 Jumia
             name_selectors = [
-                '.name',
-                '.prd-name',
-                'h3 a',
-                '.core a',
-                '[data-catalog-id] a'
+                '.name a',  # Name with link
+                '.prd-name a',  # Product name with link
+                'h3 a',  # H3 with link
+                '.core a',  # Core with link
+                '[data-catalog-id] a',  # Data catalog with link
+                'a[href*="/"]',  # Any link with href
+                '.info a'  # Info section with link
             ]
-            
+
             name = None
             product_link = None
-            
+
+            # First try to find name and link together
             for selector in name_selectors:
                 name_element = element.select_one(selector)
                 if name_element:
                     name = name_element.get_text(strip=True)
-                    if name_element.get('href'):
-                        product_link = urljoin(self.base_url, name_element.get('href'))
-                    break
+                    href = name_element.get('href')
+                    # Only accept direct product links (not login redirects)
+                    if href and self._is_valid_product_url(href):
+                        if href.startswith('/'):
+                            product_link = urljoin(self.base_url, href)
+                        elif href.startswith('http'):
+                            product_link = href
+                    if name and product_link:
+                        break
+
+            # If no name found, try name-only selectors
+            if not name:
+                name_only_selectors = [
+                    '.name',
+                    '.prd-name',
+                    'h3',
+                    '.info h3',
+                    '.title'
+                ]
+                for selector in name_only_selectors:
+                    name_element = element.select_one(selector)
+                    if name_element:
+                        name = name_element.get_text(strip=True)
+                        break
+
+            # If no link found, try link-only selectors
+            if not product_link:
+                link_selectors = [
+                    'a[href*=".html"]',  # Direct product links
+                    'a[href*="/"]',
+                    'a[href*="jumia.co.ke"]'
+                ]
+                for selector in link_selectors:
+                    link_element = element.select_one(selector)
+                    if link_element:
+                        href = link_element.get('href')
+                        # Use the same validation as above
+                        if href and self._is_valid_product_url(href):
+                            if href.startswith('/'):
+                                product_link = urljoin(self.base_url, href)
+                            elif href.startswith('http'):
+                                product_link = href
+                            break
+
+            # Clean up product name
+            if name:
+                # Remove price information and extra text
+                name = re.sub(r'KSh\s*[\d,]+', '', name)  # Remove prices
+                name = re.sub(r'\d+%', '', name)  # Remove percentages
+                name = re.sub(r'\d+\s*out\s*of\s*\d+', '', name)  # Remove ratings
+                name = re.sub(r'\(\d+\)', '', name)  # Remove review counts
+                name = re.sub(r'\s+', ' ', name).strip()  # Clean whitespace
             
             if not name:
                 return None
@@ -247,8 +316,39 @@ class JumiaScraper:
             
         except Exception as e:
             logger.error(f"Error extracting single product: {str(e)}")
-        
+
         return None
+
+    def _is_valid_product_url(self, href: str) -> bool:
+        """
+        Check if a URL is a valid product URL (not a login redirect)
+        """
+        if not href:
+            return False
+
+        # Skip login/account/redirect URLs
+        invalid_patterns = [
+            'login', 'account', 'customer', 'auth', 'signin', 'signup',
+            'tkWl=', 'return=', 'redirect'
+        ]
+
+        for pattern in invalid_patterns:
+            if pattern in href.lower():
+                return False
+
+        # Prefer direct product URLs
+        valid_patterns = [
+            '.html',  # Direct product pages
+            '/catalog/',  # Catalog pages
+            '-\d+\.html',  # Product ID pattern
+        ]
+
+        for pattern in valid_patterns:
+            if re.search(pattern, href):
+                return True
+
+        # If no specific pattern matches, check if it's a reasonable product path
+        return href.startswith('/') and len(href) > 10
     
     def _extract_price_from_text(self, price_text: str) -> Optional[float]:
         """

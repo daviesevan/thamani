@@ -75,6 +75,12 @@ def seed_database():
                 "website_url": "https://www.masoko.com",
                 "logo_url": "https://www.masoko.com/favicon.ico",
                 "country_code": "KE"
+            },
+            {
+                "name": "Kenyatronics",
+                "website_url": "https://kenyatronics.com",
+                "logo_url": "https://kenyatronics.com/favicon.ico",
+                "country_code": "KE"
             }
         ]
         

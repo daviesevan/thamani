@@ -287,6 +287,106 @@ class JijiScraperConfig(RetailerScraperConfig):
             return float(max(numbers, key=float))
         return None
 
+class ZurimallScraperConfig(RetailerScraperConfig):
+    """Zurimall Kenya scraper configuration"""
+    
+    def __init__(self):
+        super().__init__("Zurimall")
+        self.requires_js = False
+        self.price_selectors = [
+            '.woocommerce-Price-amount', '.price .amount', '.price ins .amount',
+            '.price', '.woocommerce-Price-amount bdi', '.amount'
+        ]
+        self.stock_selectors = [
+            '.stock', '.availability', '.inventory-status'
+        ]
+        self.out_of_stock_indicators = [
+            'out of stock', 'unavailable', 'sold out', 'not available'
+        ]
+    
+    def extract_price(self, soup: BeautifulSoup) -> Optional[float]:
+        """Extract price from Zurimall page"""
+        for selector in self.price_selectors:
+            price_element = soup.select_one(selector)
+            if price_element:
+                price_text = price_element.get_text(strip=True)
+                price = self._parse_price(price_text)
+                if price:
+                    return price
+        return None
+    
+    def check_stock(self, soup: BeautifulSoup) -> bool:
+        """Check stock status on Zurimall"""
+        for selector in self.stock_selectors:
+            stock_element = soup.select_one(selector)
+            if stock_element:
+                stock_text = stock_element.get_text(strip=True).lower()
+                for indicator in self.out_of_stock_indicators:
+                    if indicator in stock_text:
+                        return False
+        return True  # Assume in stock if no indicator found
+    
+    def _parse_price(self, price_text: str) -> Optional[float]:
+        """Parse price text to extract numeric value"""
+        if not price_text:
+            return None
+        
+        cleaned = re.sub(r'[KES|KSH|Ksh|,\s]', '', price_text, flags=re.IGNORECASE)
+        numbers = re.findall(r'\d+\.?\d*', cleaned)
+        if numbers:
+            return float(max(numbers, key=float))
+        return None
+
+class KenyatronicsScraperConfig(RetailerScraperConfig):
+    """Kenyatronics Kenya scraper configuration"""
+    
+    def __init__(self):
+        super().__init__("Kenyatronics")
+        self.requires_js = False
+        self.price_selectors = [
+            '.price .amount', '.product-price', '.current-price', '.sale-price',
+            '.amount', '.price', '.product-price .amount'
+        ]
+        self.stock_selectors = [
+            '.stock', '.availability', '.inventory-status'
+        ]
+        self.out_of_stock_indicators = [
+            'out of stock', 'unavailable', 'sold out', 'not available'
+        ]
+    
+    def extract_price(self, soup: BeautifulSoup) -> Optional[float]:
+        """Extract price from Kenyatronics page"""
+        for selector in self.price_selectors:
+            price_element = soup.select_one(selector)
+            if price_element:
+                price_text = price_element.get_text(strip=True)
+                price = self._parse_price(price_text)
+                if price:
+                    return price
+        return None
+    
+    def check_stock(self, soup: BeautifulSoup) -> bool:
+        """Check stock status on Kenyatronics"""
+        for selector in self.stock_selectors:
+            stock_element = soup.select_one(selector)
+            if stock_element:
+                stock_text = stock_element.get_text(strip=True).lower()
+                for indicator in self.out_of_stock_indicators:
+                    if indicator in stock_text:
+                        return False
+        return True  # Assume in stock if no indicator found
+    
+    def _parse_price(self, price_text: str) -> Optional[float]:
+        """Parse price text to extract numeric value"""
+        if not price_text:
+            return None
+        
+        cleaned = re.sub(r'[KES|KSH|Ksh|,\s]', '', price_text, flags=re.IGNORECASE)
+        numbers = re.findall(r'\d+\.?\d*', cleaned)
+        if numbers:
+            return float(max(numbers, key=float))
+        return None
+
 class GenericScraperConfig(RetailerScraperConfig):
     """Generic scraper for unknown retailers"""
     
@@ -347,6 +447,8 @@ SCRAPER_CONFIGS = {
     'masoko': MasokoScraperConfig,
     'pigiame': PigiameScraperConfig,
     'jiji': JijiScraperConfig,
+    'zurimall': ZurimallScraperConfig,
+    'kenyatronics': KenyatronicsScraperConfig,
     'generic': GenericScraperConfig
 }
 

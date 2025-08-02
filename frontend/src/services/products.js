@@ -56,6 +56,21 @@ export const productService = {
     }
   },
 
+  // Get real-time price comparison for a product
+  getPriceComparison: async (productName, brand = null, limit = 10) => {
+    try {
+      const response = await api.post("/products/compare-prices", {
+        product_name: productName,
+        brand: brand,
+        limit: limit,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error getting price comparison:", error);
+      throw error;
+    }
+  },
+
   // Get all categories
   getCategories: async () => {
     try {

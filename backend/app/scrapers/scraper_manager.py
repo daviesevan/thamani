@@ -11,6 +11,8 @@ import threading
 from .jumia_scraper import JumiaScraper
 from .kilimall_scraper import KilimallScraper
 from .jiji_scraper import JijiScraper
+from .zurimall_scraper import ZurimallScraper
+from .kenyatronics_scraper import KenyatronicsScraper
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +25,9 @@ class ScraperManager:
         self.scrapers = {
             'jumia': JumiaScraper(),
             'kilimall': KilimallScraper(),
-            'jiji': JijiScraper()
+            'jiji': JijiScraper(),
+            'zurimall': ZurimallScraper(),
+            'kenyatronics': KenyatronicsScraper()
         }
         self.lock = threading.Lock()
     

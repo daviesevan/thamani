@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { productService, trackingService, productUtils } from '../services/products';
+import wishlistService from '../services/wishlist';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import PriceComparison from '../components/products/PriceComparison';
@@ -20,12 +21,15 @@ const ProductDetail = () => {
   const [trackingData, setTrackingData] = useState(null);
   const [showTrackingModal, setShowTrackingModal] = useState(false);
   const [trackingLoading, setTrackingLoading] = useState(false);
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
 
   useEffect(() => {
     if (productId) {
       loadProductDetails();
       if (user?.user_id) {
         checkTrackingStatus();
+        checkWishlistStatus();
       }
     }
   }, [productId, user?.user_id]);
@@ -132,6 +136,57 @@ const ProductDetail = () => {
     }
   };
 
+  const checkWishlistStatus = async () => {
+    try {
+      const inWishlist = await wishlistService.isProductInWishlist(user.user_id, productId);
+      setIsInWishlist(inWishlist);
+    } catch (error) {
+      console.error('Error checking wishlist status:', error);
+    }
+  };
+
+  const handleWishlistToggle = async () => {
+    if (!user?.user_id) {
+      showToast('Please sign in to add products to wishlist', 'error');
+      return;
+    }
+
+    setWishlistLoading(true);
+    try {
+      if (isInWishlist) {
+        // Remove from wishlist
+        const wishlistItem = await wishlistService.getWishlistItemForProduct(user.user_id, productId);
+        if (wishlistItem) {
+          await wishlistService.removeItemFromWishlist(
+            user.user_id,
+            wishlistItem.wishlist_id,
+            wishlistItem.wishlist_item_id
+          );
+          setIsInWishlist(false);
+          showToast('Product removed from wishlist', 'success');
+        }
+      } else {
+        // Add to wishlist
+        const currentPrice = product?.price_info?.min_price ||
+          (product?.retailers && product.retailers.length > 0 ? product.retailers[0].current_price : null);
+
+        await wishlistService.quickAddToWishlist(user.user_id, {
+          product_id: productId,
+          notes: `Added ${product?.name} to wishlist`,
+          priority: 'medium',
+          target_price: currentPrice
+        });
+        setIsInWishlist(true);
+        showToast('Product added to wishlist', 'success');
+      }
+    } catch (error) {
+      console.error('Error updating wishlist:', error);
+      showToast('Error updating wishlist', 'error');
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
+
   const formatPrice = (price) => {
     return productUtils.formatPrice(price, 'KES');
   };
@@ -143,7 +198,7 @@ const ProductDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="flex items-center justify-center h-64">
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -151,12 +206,12 @@ const ProductDetail = () => {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
             Product Not Found
           </h2>
-          <Button onClick={() => navigate('/products/search')}>
+          <Button onClick={() => navigate('/dashboard/search')}>
             Browse Products
           </Button>
         </div>
@@ -167,29 +222,35 @@ const ProductDetail = () => {
   const bestDeal = getBestDeal();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4 py-6">
-        {/* Breadcrumb */}
-        <nav className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 mb-6">
-          <button
-            onClick={() => navigate('/products/search')}
-            className="hover:text-gray-700 dark:hover:text-gray-300"
-          >
-            Products
-          </button>
-          <span>/</span>
-          {product.category && (
-            <>
-              <span>{product.category.name}</span>
-              <span>/</span>
-            </>
-          )}
-          <span className="text-gray-900 dark:text-white">{product.name}</span>
-        </nav>
+    <div className="space-y-6">
+      {/* Breadcrumb */}
+      <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="hover:text-foreground transition-colors"
+        >
+          Dashboard
+        </button>
+        <span>/</span>
+        <button
+          onClick={() => navigate('/dashboard/search')}
+          className="hover:text-foreground transition-colors"
+        >
+          Search
+        </button>
+        <span>/</span>
+        {product.category && (
+          <>
+            <span>{product.category.name}</span>
+            <span>/</span>
+          </>
+        )}
+        <span className="text-foreground font-medium">{product.name}</span>
+      </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          {/* Product Image */}
-          <div className="aspect-square bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Product Image */}
+        <div className="aspect-square bg-background rounded-lg overflow-hidden border border-border">
             {product.image_url ? (
               <img
                 src={product.image_url}
@@ -201,8 +262,8 @@ const ProductDetail = () => {
                 }}
               />
             ) : null}
-            <div className={`w-full h-full flex items-center justify-center ${product.image_url ? 'hidden' : 'flex'}`}>
-              <svg className="h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className={`w-full h-full flex items-center justify-center bg-muted ${product.image_url ? 'hidden' : 'flex'}`}>
+              <svg className="h-24 w-24 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
@@ -213,22 +274,22 @@ const ProductDetail = () => {
             {/* Header */}
             <div>
               {product.category && (
-                <div className="text-sm text-blue-600 dark:text-blue-400 font-medium mb-2">
+                <div className="text-sm text-primary font-medium mb-2">
                   {product.category.name}
                 </div>
               )}
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
                 {product.name}
               </h1>
               {product.brand && (
-                <p className="text-lg text-gray-600 dark:text-gray-400">
+                <p className="text-lg text-muted-foreground">
                   by {product.brand}
                 </p>
               )}
             </div>
 
             {/* Price Info */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+            <div className="bg-background rounded-lg p-6 border border-border">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">Price Range</div>
@@ -291,6 +352,31 @@ const ProductDetail = () => {
 
               {/* Action Buttons */}
               <div className="flex space-x-3">
+                {/* Wishlist Button */}
+                {user?.user_id && (
+                  <Button
+                    onClick={handleWishlistToggle}
+                    disabled={wishlistLoading}
+                    variant={isInWishlist ? "default" : "outline"}
+                    className="flex-1"
+                  >
+                    {wishlistLoading ? (
+                      <div className="flex items-center">
+                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
+                        {isInWishlist ? 'Removing...' : 'Adding...'}
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center">
+                        <span className="mr-2">
+                          {isInWishlist ? '♥' : '♡'}
+                        </span>
+                        {isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
+                      </div>
+                    )}
+                  </Button>
+                )}
+
+                {/* Tracking Button */}
                 {!isTracked ? (
                   <Button
                     onClick={() => setShowTrackingModal(true)}
@@ -310,7 +396,7 @@ const ProductDetail = () => {
                     Update Tracking
                   </Button>
                 )}
-                
+
                 {bestDeal && (
                   <Button
                     variant="outline"
@@ -367,22 +453,25 @@ const ProductDetail = () => {
           </div>
         </div>
 
-        {/* Price Comparison */}
-        <div className="mb-8">
-          <PriceComparison retailers={product.retailers} />
-        </div>
-
-        {/* Tracking Modal */}
-        {showTrackingModal && (
-          <TrackingModal
-            product={product}
-            existingTracking={trackingData}
-            onSave={isTracked ? handleUpdateTracking : handleTrackProduct}
-            onClose={() => setShowTrackingModal(false)}
-            loading={trackingLoading}
-          />
-        )}
+      {/* Price Comparison */}
+      <div>
+        <PriceComparison
+          retailers={product.retailers}
+          product={product}
+          enableRealTimeComparison={true}
+        />
       </div>
+
+      {/* Tracking Modal */}
+      {showTrackingModal && (
+        <TrackingModal
+          product={product}
+          existingTracking={trackingData}
+          onSave={isTracked ? handleUpdateTracking : handleTrackProduct}
+          onClose={() => setShowTrackingModal(false)}
+          loading={trackingLoading}
+        />
+      )}
     </div>
   );
 };
